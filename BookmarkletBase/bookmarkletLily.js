@@ -1,6 +1,7 @@
 javascript: (() => {
   /* キャラシのサイト以外は処理しない */
-  if (!/^http(s)?:\/\/charasheet\.vampire-blood\.net\//.test(window.document.location.href)) {
+  const url = new URL(window.location.href);
+  if (url.hostname !== 'charasheet.vampire-blood.net') {
     return;
   }
 
