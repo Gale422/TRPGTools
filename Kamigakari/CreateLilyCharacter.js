@@ -92,34 +92,115 @@ javascript: (() => {
   };
 
   /* ダイスボットを設定する */
-  const diceBotName = '';
+  const diceBotName = 'Kamigakari';
   /* キャラ名を設定する */
-  const charName = '';
+  const charName = `${document.querySelector('#pc_name').value || 'NoName'}`;
   /* 詳細データを追加する */
   const detailList = [];
 
   {
-    const result = dataCreator({name: 'リソース'});
-    const maxHP = 100;
-    result.appendChild(dataCreator({ name: 'HP', type: 'numberResource', currentValue: maxHP }, maxHP));
+    const result = dataCreator({ name: 'リソース' });
+    let hp = document.querySelector('#NP9').value;
+    result.appendChild(dataCreator({ name: '生命力', type: 'numberResource', currentValue: hp }, hp));
+    result.appendChild(dataCreator({ name: '霊紋', type: 'numberResource', currentValue: 22 }, 22));
+    result.appendChild(dataCreator({ name: '感情', type: 'numberResource', currentValue: 1 }, 7));
     detailList.push(result);
   }
   {
-    const result = dataCreator({ name: 'リソース' });
-    const maxHP = 100;
-    result.appendChild(dataCreator({ name: '通常の数値' }, 0));
-    result.appendChild(dataCreator({ name: 'HP', type: 'numberResource', currentValue: maxHP }, maxHP));
-    result.appendChild(dataCreator({ name: 'ノート', type: 'note' }, ''));
-    result.appendChild(dataCreator({ name: 'チェックボックス1(|で表組み可能)', type: 'markdown' }, '[]'.repeat('5')));
-    result.appendChild(dataCreator({ name: 'チェックボックス2(|で表組み可能)', type: 'markdown' }, '[]'.repeat(3)));
-    result.appendChild(dataCreator({ name: '単一チェック(チェックなし)', type: 'check' }, 0));
-    result.appendChild(dataCreator({ name: '単一チェック(チェックあり)', type: 'check' }, 1));
+    const result = dataCreator({ name: '判定値' });
+    result.appendChild(dataCreator({ name: '体力' }, document.querySelector('#NB1').value));
+    result.appendChild(dataCreator({ name: '敏捷' }, document.querySelector('#NB2').value));
+    result.appendChild(dataCreator({ name: '知性' }, document.querySelector('#NB3').value));
+    result.appendChild(dataCreator({ name: '精神' }, document.querySelector('#NB4').value));
+    result.appendChild(dataCreator({ name: '幸運' }, document.querySelector('#NB5').value));
+    detailList.push(result);
+  }
+  {
+    const result = dataCreator({ name: '戦闘能力値' });
+    result.appendChild(dataCreator({ name: '命中' }, document.querySelector('#NP1').value));
+    result.appendChild(dataCreator({ name: '回避' }, document.querySelector('#kaihi').value));
+    result.appendChild(dataCreator({ name: '発動' }, document.querySelector('#NP3').value));
+    result.appendChild(dataCreator({ name: '抵抗' }, document.querySelector('#NP4').value));
+    result.appendChild(dataCreator({ name: '看破' }, document.querySelector('#NP5').value));
+    result.appendChild(dataCreator({ name: '物D' }, document.querySelector('#NP6').value));
+    result.appendChild(dataCreator({ name: '魔D' }, document.querySelector('#NP7').value));
+    result.appendChild(dataCreator({ name: '行動値' }, document.querySelector('#act').value));
+    result.appendChild(dataCreator({ name: '攻撃命中値' }, document.querySelector('input[name=arms_total_hit]').value));
+    result.appendChild(dataCreator({ name: '攻撃ダメージ値' }, document.querySelector('input[name=arms_total_damage]').value));
+    result.appendChild(dataCreator({ name: '主能力値' }, Math.max(...[
+      document.querySelector('#NK1').value,
+      document.querySelector('#NK2').value,
+      document.querySelector('#NK3').value,
+      document.querySelector('#NK4').value,
+      document.querySelector('#NK5').value,
+    ].map(e => Number(e)))));
+    result.appendChild(dataCreator({ name: '装甲' }, document.querySelector('#def').value));
+    result.appendChild(dataCreator({ name: '結界' }, document.querySelector('#mdef').value));
+    result.appendChild(dataCreator({ name: '移動力' }, document.querySelector('#ido').value));
+    result.appendChild(dataCreator({ name: '全力移動' }, document.querySelector('#zenryoku_ido').value));
+    result.appendChild(dataCreator({ name: '生命燃焼時の生命力' }, document.querySelector('#NK1').value));
+    detailList.push(result);
+  }
+  {
+    const selectedText = (selectDom) => {
+      if (!selectDom || selectDom.tagName !== 'SELECT') {
+        return '';
+      }
+      return selectDom.options[selectDom.selectedIndex].textContent
+    };
+    const result = dataCreator({ name: 'パーソナルデータ' });
+    result.appendChild(dataCreator({ name: '種族' }, `${document.querySelector('input[name=manual_shuzoku]').value} ${selectedText(document.querySelector('#SL_shuzoku_type'))}型`));
+    result.appendChild(dataCreator({ name: 'メイン称号' }, `${document.querySelector('#main_class').value} タイプ${selectedText(document.querySelector('#SL_main_class_type'))}`));
+    result.appendChild(dataCreator({ name: 'サブ称号' }, `${document.querySelector('#support_class').value} タイプ${selectedText(document.querySelector('#SL_sub_class_type'))}`));
+    result.appendChild(dataCreator({ name: '表の職業' }, document.querySelector('input[name=omote_face]').value));
+    result.appendChild(dataCreator({ name: '所属組織' }, document.querySelector('#shuzoku').value));
+    result.appendChild(dataCreator({ name: '所持金' }, document.querySelector('#money').value));
     detailList.push(result);
   }
 
   /* チャットパレットの文字列 */
   const getChatPaletteText = () => {
     let txt = '';
+    txt += `//---判定値\n`;
+    txt += `2D6+{体力}>=0 【体力】\n`;
+    txt += `2D6+{敏捷}>=0 【敏捷】\n`;
+    txt += `2D6+{知性}>=0 【知性】\n`;
+    txt += `2D6+{精神}>=0 【精神】\n`;
+    txt += `2D6+{幸運}>=0 【幸運】\n`;
+    txt += `ET 感情表\n`;
+    txt += `\n`;
+    txt += `//---霊力・霊紋\n`;
+    txt += `4B6 霊力回復\n`;
+    txt += `:霊紋-D6 物理超越のコスト(上限3D)\n`;
+    txt += `:霊紋-2D6 生命燃焼のコスト :生命力={生命燃焼時の生命力}\n`;
+    txt += `:霊紋-2D6 概念破壊(コスト)\n`;
+    txt += `1D 概念破壊(上昇ランク)\n`;
+    txt += `\n`;
+    txt += `//---戦闘時・判定\n`;
+    txt += `2D6+{命中}>=0 【命中】\n`;
+    txt += `2D6+{回避}>=0 【回避】(装備品適用後)\n`;
+    txt += `2D6+{発動}>=0 【発動】\n`;
+    txt += `2D6+{抵抗}>=0 【抵抗】\n`;
+    txt += `2D6+{看破}>=0 【看破】\n`;
+    txt += `\n`;
+    txt += `//---戦闘時・ダメージ減少\n`;
+    txt += `:生命力-(n-{装甲})LZ 【受動物理ダメージ適用後】\n`;
+    txt += `:生命力-((n-{装甲})/2C)LZ 【受動物理ダメージ適用後】(半減1回・端数切り上げ)\n`;
+    txt += `:生命力-(n-{結界})LZ 【受動魔法ダメージ適用後】\n`;
+    txt += `:生命力-((n-{結界})/2C)LZ 【受動魔法ダメージ適用後】(半減1回・端数切り上げ)\n`;
+    txt += `:生命力-((n-{結界})/2C/2C)LZ 【受動魔法ダメージ適用後】(半減2回・端数切り上げ)\n`;
+    txt += `:生命力-((n-{結界})/2C/2C/2C)LZ 【受動魔法ダメージ適用後】(半減3回・端数切り上げ)\n`;
+    txt += `\n`;
+    txt += `//---戦闘時・攻撃\n`;
+    txt += `2D6+{攻撃命中値}>=0 【攻撃命中値】(装備品適用後)\n`;
+    txt += `C(*+{攻撃ダメージ値}+) 攻撃のダメージ\n`;
+    txt += `\n`;
+    txt += `//---バフ操作\n`;
+    txt += `&バフ名/効果/R数 バフ追加\n`;
+    txt += `&バフ名- バフ削除\n`;
+    txt += `&R+ バフのラウンド+1\n`;
+    txt += `&R- バフのラウンド-1\n`;
+    txt += `&D 0R以下のバフを消去\n`;
     return txt;
   };
 
