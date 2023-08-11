@@ -125,8 +125,13 @@ javascript: (() => {
           result.appendChild(dataCreator({ name: 'DEX' }, json.dexterity));
           result.appendChild(dataCreator({ name: 'POW' }, json.power));
           result.appendChild(dataCreator({ name: 'INT' }, json.intelligence));
-          result.appendChild(dataCreator({ name: '回避' }, `${json.avoid_dice}D+${json.avoid}`));
-          result.appendChild(dataCreator({ name: '抵抗' }, `${json.resist_dice}D+${json.resist}`));
+          if (json.rank === 'モブ'){
+            result.appendChild(dataCreator({ name: '回避' }, `${json.avoid}［固定］`));
+            result.appendChild(dataCreator({ name: '抵抗' }, `${json.resist}［固定］`));
+          } else {
+            result.appendChild(dataCreator({ name: '回避' }, `${json.avoid_dice}D+${json.avoid}`));
+            result.appendChild(dataCreator({ name: '抵抗' }, `${json.resist_dice}D+${json.resist}`));
+          }
           result.appendChild(dataCreator({ name: '物理防御力' }, json.physical_defense || ''));
           result.appendChild(dataCreator({ name: '魔法防御力' }, json.magic_defense || ''));
           result.appendChild(dataCreator({ name: 'ヘイト倍率' }, json.hate || ''));
@@ -192,8 +197,13 @@ javascript: (() => {
         const getChatPaletteText = (json) => {
           let txt = '';
           txt += `//--- 受動判定\n`;
-          txt += `${json.avoid_dice}LH+${json.avoid}>=0 [回避]\n`;
-          txt += `${json.resist_dice}LH+${json.resist}>=0 [抵抗]\n`;
+          if (json.rank === 'モブ'){
+            txt += `${json.avoid} [回避(固定)]\n`;
+            txt += `${json.resist} [抵抗(固定)]\n`;
+          } else {
+            txt += `${json.avoid_dice}LH+${json.avoid}>=0 [回避]\n`;
+            txt += `${json.resist_dice}LH+${json.resist}>=0 [抵抗]\n`;
+          }
           txt += `:HP-+{物理防御力}LZ 被物理ダメージ\n`;
           txt += `:HP-+{魔法防御力}LZ 被魔法ダメージ\n`;
           txt += `:HP-LZ 貫通・直接点ダメージ\n`;
