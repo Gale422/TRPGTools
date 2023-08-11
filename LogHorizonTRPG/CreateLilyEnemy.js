@@ -114,6 +114,9 @@ javascript: (() => {
           result.appendChild(dataCreator({ name: '軽減' }, 0));
           result.appendChild(dataCreator({ name: '再生' }, 0));
           result.appendChild(dataCreator({ name: '因果力' }, json.fate || ''));
+          result.appendChild(dataCreator({ name: 'BS' , type: 'note' }, ''));
+          result.appendChild(dataCreator({ name: 'LS' , type: 'note' }, ''));
+          result.appendChild(dataCreator({ name: 'OS' , type: 'note' }, ''));
           detailList.push(result);
         }
         {
@@ -189,7 +192,7 @@ javascript: (() => {
           eTxt += json.items?.map(i=>`${i.dice} : ${i.item}`).join(`\n`);
           eTxt += '\n\n';
           result.appendChild(dataCreator({ name: 'ドロップ品', type: 'note' }, eTxt));
-          result.appendChild(dataCreator({ name: '解説', type: 'note' }, json.contents || ''));
+          result.appendChild(dataCreator({ name: '解説', type: 'note' }, `▼解説\n${json.contents}` || ''));
           detailList.push(result);
         }
 
