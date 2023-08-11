@@ -211,6 +211,7 @@ javascript: (() => {
           txt += `//--- 能動判定\n`;
           txt += `1D 対象選択\n`;
           txt += `choice[] 対象選択\n`;
+          txt += `C(*{ヘイト倍率}) ヘイトダメージ\n`;
           txt += `\n`;
           txt += json.skills?.filter(s=> {
             return s.timing === 'メジャー' && s.role?.includes('対決')
