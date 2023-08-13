@@ -260,6 +260,10 @@ javascript: (() => {
     txt += `R>=[,1,13] 判定\n`;
     txt += `SR{性業値} 性業値\n`;
     txt += `\n`;
+    txt += `:精神点={精神点^}LZ 睡眠\n`;
+    txt += `:精神点-1D6LZ ファンブルからの逆転\n`;
+    txt += `:精神点+1LZ 食事\n`;
+    txt += `\n`;
     Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => { return elem.querySelector('[id$=place]').value === ''; }).map(elem => {
       return {
         name: elem.querySelector('[id$=name]').value,
@@ -273,7 +277,7 @@ javascript: (() => {
       if(value.range === '格闘') {
         txt += `C({破壊力}+) ダメージ(${value.name})\n`;
       } else {
-        txt += `C(${value.damage}+) ダメージ(${value.name})\n`;
+        txt += `C(${value.damage}) ダメージ(${value.name})\n`;
       }
       txt += `\n`;
     });
