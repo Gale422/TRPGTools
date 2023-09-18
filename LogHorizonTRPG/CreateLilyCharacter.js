@@ -116,14 +116,14 @@ javascript: (() => {
       }
       {
         const result = dataCreator({ name: '戦闘の諸数値' });
-        result.appendChild(dataCreator({ name: '行動力' }, json.action || ''));
-        result.appendChild(dataCreator({ name: '移動力' }, json.move || ''));
-        result.appendChild(dataCreator({ name: '武器の射程' }, json.range || ''));
-        result.appendChild(dataCreator({ name: '攻撃力' }, json.physical_attack || ''));
-        result.appendChild(dataCreator({ name: '魔力' }, json.magic_attack || ''));
-        result.appendChild(dataCreator({ name: '回復力' }, json.heal_power || ''));
-        result.appendChild(dataCreator({ name: '物理防御力' }, json.physical_defense || ''));
-        result.appendChild(dataCreator({ name: '魔法防御力' }, json.magic_defense || ''));
+        result.appendChild(dataCreator({ name: '行動力' }, json.action || 0));
+        result.appendChild(dataCreator({ name: '移動力' }, json.move || 0));
+        result.appendChild(dataCreator({ name: '武器の射程' }, json.range || 0));
+        result.appendChild(dataCreator({ name: '攻撃力' }, json.physical_attack || 0));
+        result.appendChild(dataCreator({ name: '魔力' }, json.magic_attack || 0));
+        result.appendChild(dataCreator({ name: '回復力' }, json.heal_power || 0));
+        result.appendChild(dataCreator({ name: '物理防御力' }, json.physical_defense || 0));
+        result.appendChild(dataCreator({ name: '魔法防御力' }, json.magic_defense || 0));
         detailList.push(result);
       }
       {
