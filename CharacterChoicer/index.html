@@ -82,13 +82,28 @@
         </tbody>
       </table>
     </div>
+    <h2>よく使うキャラクター名</h2>
+    <div>よく使うキャラ名を入力し、保存しておくことができます。追加ボタンでPLキャラクターの名称の最後に追加します。削除ボタンで一覧から削除します。</div>
+    <div id="savingCharaArea">
+      <div>キャラ名：<input type="text" id="savingCharaName"></div>
+      <div><button type="button" id="save">保存</button></div>
+    </div>
+    <div id="savedCharaList"></div>
     <template id="charaTemplate">
       <tr>
         <td class="charaCheck"><input type="checkbox"></td>
         <td><input type="text" class="charaName"></td>
       </tr>
     </template>
+    <template id="savedCharaTemplate">
+      <div class="savedCharaData" data-chara-id="">
+        <div class="savedCharaName" data-chara-id=""></div>
+        <div><button type="button" class="addName" data-chara-id="">追加</button></div>
+        <div><button type="button" class="delName" data-chara-id="">削除</button></div>
+      </div>
+    </template>
   </body>
   <script src="main.js"></script>
   <link rel="stylesheet" href="style.css">
+
 </html>
