@@ -1,0 +1,74 @@
+#flexBox {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  row-gap: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#ControlArea {
+  width: 100vw;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  column-gap: 10px;
+}
+
+#ControlArea>div:last-child {
+  flex-grow: 1;
+}
+
+#choiceNum {
+  width: 40px;
+}
+
+#result {
+  width: 100%;
+}
+
+#PLListTable,
+#OtherTable {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 40vw;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+#PLListTable,
+#PLListTable th,
+#PLListTable td {
+  border: 1px solid #000000;
+}
+
+#OtherTable,
+#OtherTable th,
+#OtherTable td {
+  border: 1px solid #000000;
+}
+
+.tableCheck,
+#PLListTable tr:not(.listNavi) td:first-child,
+#OtherTable tr:not(.listNavi) td:first-child {
+  width: 30px;
+  text-align: center;
+}
+
+#PLListTable tr:not(.listNavi) td:not(:first-child),
+#OtherTable tr:not(.listNavi) td:not(:first-child) {
+  position: relative;
+}
+
+#PLListTable tr:not(.listNavi) td:not(:first-child) input,
+#OtherTable tr:not(.listNavi) td:not(:first-child) input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.listNavi div {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}

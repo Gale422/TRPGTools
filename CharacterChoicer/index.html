@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ココフォリア用キャラクター選択ツール</title>
+  </head>
+
+  <body>
+    <h1>キャラクター選択ツール</h1>
+    <div id="flexBox">
+      <div id="ControlArea">
+        <div>選択するキャラクター数を入力：<input type="number" id="choiceNum"></div>
+        <div><button type="button" id="create">作成</button></div>
+        <div><input type="text" id="result"></div>
+      </div>
+      <table id="PLListTable">
+        <thead>
+          <tr>
+            <th class="tableCheck"><input type="checkbox"></th>
+            <th>PLキャラクターの名称</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr class="listNavi">
+            <td colspan="2">
+              <div>
+                <button type="button" class="place">+</button><button type="button" class="minus">-</button><button type="button" class="nameDel">名称全削除</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <table id="OtherTable">
+        <thead>
+          <tr>
+            <th class="tableCheck"><input type="checkbox"></th>
+            <th>その他(エネミー等)の名称</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr>
+            <td class="charaCheck"><input type="checkbox"></td>
+            <td><input type="text" class="charaName"></td>
+          </tr>
+          <tr class="listNavi">
+            <td colspan="2">
+              <div>
+                <button type="button" class="place">+</button><button type="button" class="minus">-</button><button type="button" class="nameDel">名称全削除</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <template id="charaTemplate">
+      <tr>
+        <td class="charaCheck"><input type="checkbox"></td>
+        <td><input type="text" class="charaName"></td>
+      </tr>
+    </template>
+  </body>
+  <script src="main.js"></script>
+  <link rel="stylesheet" href="style.css">
+</html>
