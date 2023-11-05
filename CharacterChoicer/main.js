@@ -48,17 +48,13 @@
   // プラスボタン
   document.querySelectorAll('.place').forEach(e => {
     e.addEventListener('click', event => {
-      const lastRow = event.currentTarget.closest('table').querySelector('tbody tr:not(.listNavi)');
+      const listNavi = event.currentTarget.closest('table').querySelector('tbody tr.listNavi');
       // 新しい行を複製して表に挿入します。
       const template = document.querySelector('#charaTemplate');
       const clone = template.content.cloneNode(true);
-      if (lastRow) {
-        lastRow.after(clone);
+      if (listNavi) {
+        listNavi.before(clone);
       } else {
-        const listNavi = event.currentTarget.closest('table').querySelector('tbody tr.listNavi');
-        if (listNavi) {
-          listNavi.before(clone);
-        }
         event.currentTarget.closest('table').querySelector('tbody').append(clone);
       }
     });
@@ -68,10 +64,8 @@
   document.querySelectorAll('.minus').forEach(e => {
     e.addEventListener('click', event => {
       // 最後の行を削除します。
-      const lastRow = event.currentTarget.closest('table').querySelector('tbody tr:not(.listNavi)');
-      if (lastRow) {
-        lastRow.remove();
-      }
+      const listNavi = event.currentTarget.closest('table').querySelector('tbody tr.listNavi');
+      listNavi.previousElementSibling?.remove();
     });
   });
 
