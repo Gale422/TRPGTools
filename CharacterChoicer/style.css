@@ -90,6 +90,8 @@
   flex-wrap: wrap;
   align-content: flex-start;
   row-gap: 10px;
+  column-gap: 20px;
+  height: 50vh;
   margin-left: 20px;
   margin-right: 20px;
 }
