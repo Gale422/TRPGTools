@@ -109,7 +109,7 @@ javascript: (() => {
         result.appendChild(dataCreator({ name: '障壁', type: 'numberResource', currentValue: 0 }, 999));
         result.appendChild(dataCreator({ name: '軽減' }, 0));
         result.appendChild(dataCreator({ name: '再生' }, 0));
-        result.appendChild(dataCreator({ name: '因果力' }, json.effect || ''));
+        result.appendChild(dataCreator({ name: '因果力' }, json.effect || 0));
         result.appendChild(dataCreator({ name: 'ヘイト', type: 'numberResource', currentValue: 0 }, 25));
         result.appendChild(dataCreator({ name: '疲労' }, 0));
         detailList.push(result);
