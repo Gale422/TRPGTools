@@ -123,19 +123,23 @@
         dataStr = '[]';
       }
       const dataList = JSON.parse(dataStr);
-      // データの更新
-      const result = dataList.map(data => (data === name || data.name === name) ? { name: name, group: group } : data);
+      // データの更新(対象データが存在しないリストにする→値の追加)
+      let result = dataList.filter(data => data !== name && data?.name !== name);
+      result.push({ name: name, group: group });
       localStorage.setItem(savedKey, JSON.stringify(result));
       document.querySelector('#savingCharaName').value = '';
       reload();
     }
   });
 
-  document.querySelector('#savingCharaName').addEventListener('keydown', event => {
-    if (event.keyCode === 13) {
-      // エンターキーが押された場合は保存ボタンと同様の動作をする
-      document.querySelector('#save').dispatchEvent(new Event('click'));
-    }
+  // キャラ名保存ボタン(エンターキー対応)
+  document.querySelectorAll('#savingCharaName,#savingCharaGroup').forEach(e => {
+    e.addEventListener('keydown', event => {
+      if (event.keyCode === 13) {
+        // エンターキーが押された場合は保存ボタンと同様の動作をする
+        document.querySelector('#save').dispatchEvent(new Event('click'));
+      }
+    });
   });
 
   document.querySelector('body').addEventListener('click', event => {
@@ -182,7 +186,7 @@
           dataStr = '[]';
         }
         let data = JSON.parse(dataStr);
-        data = data.filter(e => e !== charaName);
+        data = data.filter(e => e !== charaName && e?.name !== charaName);
         localStorage.setItem(savedKey, JSON.stringify(data));
         reload();
       }

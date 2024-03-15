@@ -107,3 +107,7 @@
 .savedCharaName {
   margin-right: auto;
 }
+
+.savedCharaGroup {
+  min-width: 20px;
+}
