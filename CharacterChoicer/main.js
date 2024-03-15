@@ -91,10 +91,21 @@
     const dataStr = localStorage.getItem(savedKey);
     if (dataStr) {
       const dataList = JSON.parse(dataStr);
-      for (const name of dataList) {
+      // 古いデータに対する互換性をもたせるため、古いデータを変換する
+      let result = dataList.map(data => (typeof data === "string" || data instanceof String) ? { name: data, group: "" } : data);
+      result.sort((a, b) => {
+        if (a.group === b.group) {
+          return 0;
+        } else {
+          return a.group.localeCompare(b.group, 'ja');
+        }
+      });
+
+      for (const { name, group } of result) {
         // 新しい行を複製して表に挿入します。
         const template = document.querySelector('#savedCharaTemplate');
         const clone = template.content.cloneNode(true);
+        clone.querySelector('.savedCharaGroup').textContent = group;
         clone.querySelector('.savedCharaName').textContent = name;
         list.appendChild(clone);
       }
@@ -103,18 +114,18 @@
 
   // キャラ名保存ボタン
   document.querySelector('#save').addEventListener('click', event => {
-    const name = document.querySelector('#savingCharaName').value;
+    const name = document.querySelector('#savingCharaName').value || "";
+    const group = document.querySelector('#savingCharaGroup').value || "";
     if (name) {
       let dataStr = localStorage.getItem(savedKey);
       if (!dataStr) {
         // 初めてのため、初期化
         dataStr = '[]';
       }
-      const data = JSON.parse(dataStr);
-      if (!data.includes(name)) {
-        data.push(name);
-      }
-      localStorage.setItem(savedKey, JSON.stringify(data));
+      const dataList = JSON.parse(dataStr);
+      // データの更新
+      const result = dataList.map(data => (data === name || data.name === name) ? { name: name, group: group } : data);
+      localStorage.setItem(savedKey, JSON.stringify(result));
       document.querySelector('#savingCharaName').value = '';
       reload();
     }
