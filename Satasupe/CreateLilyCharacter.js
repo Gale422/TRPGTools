@@ -260,9 +260,10 @@ javascript: (() => {
     txt += `R>=[,1,13] 判定\n`;
     txt += `SR{性業値} 性業値\n`;
     txt += `\n`;
-    txt += `:精神点={精神点^}LZ 睡眠\n`;
+    txt += `:精神点+(10-0)LZ 睡眠\n`;
     txt += `:精神点-1D6LZ ファンブルからの逆転\n`;
     txt += `:精神点+1LZ 食事\n`;
+    txt += `NPCT :精神点+1LZ お酒\n`;
     txt += `\n`;
     Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => { return elem.querySelector('[id$=place]').value === ''; }).map(elem => {
       return {
