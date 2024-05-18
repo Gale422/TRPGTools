@@ -249,15 +249,16 @@ javascript: (() => {
   /* チャットパレットの文字列 */
   const getChatPaletteText = () => {
     let txt = '';
-    txt += `({犯罪}+0)R>=5[,1,13] 犯罪判定\n`;
-    txt += `({生活}+0)R>=5[,1,13] 生活判定\n`;
-    txt += `({恋愛}+0)R>=5[,1,13] 恋愛判定\n`;
-    txt += `({教養}+0)R>=5[,1,13] 教養判定\n`;
-    txt += `({戦闘}+0)R>=5[,1,13] 戦闘判定\n`;
-    txt += `({肉体}+0)R>=5[,1,13] 肉体判定\n`;
-    txt += `({精神}+0)R>=5[,1,13] 精神判定\n`;
+    txt += `//--- 判定\n`;
+    txt += `({犯罪}+0{肉体重傷}{精神重傷})R>=5[,1,13] 犯罪判定\n`;
+    txt += `({生活}+0{肉体重傷}{精神重傷})R>=5[,1,13] 生活判定\n`;
+    txt += `({恋愛}+0{肉体重傷}{精神重傷})R>=5[,1,13] 恋愛判定\n`;
+    txt += `({教養}+0{肉体重傷}{精神重傷})R>=5[,1,13] 教養判定\n`;
+    txt += `({戦闘}+0{肉体重傷}{精神重傷})R>=5[,1,13] 戦闘判定\n`;
+    txt += `({肉体}+0{肉体重傷}{精神重傷})R>=5[,1,13] 肉体判定\n`;
+    txt += `({精神}+0{肉体重傷}{精神重傷})R>=5[,1,13] 精神判定\n`;
     txt += `\n`;
-    txt += `R>=[,1,13] 判定\n`;
+    txt += `(0+0{肉体重傷}{精神重傷})R>=[,1,13] 判定\n`;
     txt += `SR{性業値} 性業値\n`;
     txt += `\n`;
     txt += `:精神点+(10-0)LZ 睡眠\n`;
@@ -265,6 +266,13 @@ javascript: (() => {
     txt += `:精神点+1LZ 食事\n`;
     txt += `NPCT :精神点+1LZ お酒\n`;
     txt += `\n`;
+    txt += `//--- バフ\n`;
+    txt += `&肉体重傷/-1/999 バフ追加\n`;
+    txt += `&精神重傷/-1/999 バフ追加\n`;
+    txt += `&肉体重傷- バフ削除\n`;
+    txt += `&精神重傷- バフ削除\n`;
+    txt += `\n`;
+    txt += `//--- 攻撃\n`;
     Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => { return elem.querySelector('[id$=place]').value === ''; }).map(elem => {
       return {
         name: elem.querySelector('[id$=name]').value,
@@ -274,7 +282,7 @@ javascript: (() => {
         notes: elem.querySelector('[id$=notes]').value
       };
     }).forEach(value => {
-      txt += `({攻撃力}+0)R>=${value.aim}[,1,13] 攻撃判定(${value.name}) ${value.range} 【${value.notes}】\n`;
+      txt += `({攻撃力}+0{肉体重傷}{精神重傷})R>=${value.aim}[,1,13] 攻撃判定(${value.name}) ${value.range} 【${value.notes}】\n`;
       if(value.range === '格闘') {
         txt += `C({破壊力}+) ダメージ(${value.name})\n`;
       } else {
@@ -284,46 +292,46 @@ javascript: (() => {
     });
     txt += `# 各種表は、末尾に数値を入れることで回数を指定してダイスロール可能 例:TAGT3 タグ決定表\n`;
     txt += `\n`;
-    txt += `# 計画フェイズ\n`;
-    txt += `## 情報判定\n`;
+    txt += `//--- # 計画フェイズ\n`;
+    txt += `//--- ## 情報判定\n`;
     txt += `TAGT タグ決定表\n`;
     txt += `\n`;
-    txt += `### イベント表 +,- でダイス目修正、=でダイス目指定が可能\n`;
+    txt += `//--- ### イベント表 +,- でダイス目修正、=でダイス目指定が可能\n`;
     txt += `CrimeIET 犯罪表\n`;
     txt += `LifeIET 生活表\n`;
     txt += `LoveIET 恋愛表\n`;
     txt += `CultureIET 教養表\n`;
     txt += `CombatIET 戦闘表\n`;
     txt += `\n`;
-    txt += `### ハプニング表 +,- でダイス目修正、=でダイス目指定が可能\n`;
+    txt += `//--- ### ハプニング表 +,- でダイス目修正、=でダイス目指定が可能\n`;
     txt += `CrimeIHT 犯罪表\n`;
     txt += `LifeIHT 生活表\n`;
     txt += `LoveIHT 恋愛表\n`;
     txt += `CultureIHT 教養表\n`;
     txt += `CombatIHT 戦闘表\n`;
     txt += `\n`;
-    txt += `## ロマンス\n`;
+    txt += `//--- ## ロマンス\n`;
     txt += `RomanceFT ロマンスファンブル表\n`;
     txt += `\n`;
-    txt += `# 実行フィエズ\n`;
-    txt += `## 血戦\n`;
+    txt += `//--- # 実行フィエズ\n`;
+    txt += `//--- ## 血戦\n`;
     txt += `FumbleT 命中判定ファンブル表\n`;
     txt += `FatalT 致命傷表\n`;
     txt += `\n`;
-    txt += `## ケチャップ\n`;
+    txt += `//--- ## ケチャップ\n`;
     txt += `AccidentT アクシデント表\n`;
     txt += `GeneralAT 汎用アクシデント表\n`;
     txt += `\n`;
-    txt += `## 宝物表\n`;
+    txt += `//--- ## 宝物表\n`;
     txt += `GetgT ガラクタ\n`;
     txt += `GetzT 実用品\n`;
     txt += `GetnT 値打ち物\n`;
     txt += `GetkT 奇天烈\n`;
     txt += `\n`;
-    txt += `# アフタープレイ\n`;
+    txt += `//--- # アフタープレイ\n`;
     txt += `AfterT その後表\n`;
     txt += `\n`;
-    txt += `# その他\n`;
+    txt += `//--- # その他\n`;
     txt += `KusaiMT 臭い飯表\n`;
     txt += `EnterT 登場表\n`;
     txt += `BudTT バッドトリップ表\n`;
