@@ -253,9 +253,10 @@ javascript: (() => {
         txt += `\n`;
         txt += `//--- 能動判定\n`;
         txt += `${convertStr(json?.abl_hit)}>=0 [命中値]${nameOfHighestAbility(json || {})} 基本武器攻撃or基本魔法攻撃 :ヘイト+0\n`;
-        txt += `${convertStr(json?.abl_hit)}>=0 [命中値]${nameOfHighestAbility(json || {})} ◯◯ :ヘイト+n\n`;
         txt += `1D6+{攻撃力} 基本武器攻撃\n`;
         txt += `1D6+{魔力} 基本魔法攻撃\n`;
+        txt += `※作成例\n`;
+        txt += `${convertStr(json?.abl_hit)}>=0 [命中値]${nameOfHighestAbility(json || {})} ◯◯ :ヘイト+n\n`;
         txt += `t:HP+3D6+{魔力}+{回復力}LZ ヒール :ヘイト+1\n`;
         txt += `t:ヘイト-3LZ パシフィケーション\n`;
         txt += `\n`;
