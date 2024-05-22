@@ -103,7 +103,7 @@ javascript: (() => {
     let hp = document.querySelector('#NP9').value;
     result.appendChild(dataCreator({ name: '生命力', type: 'numberResource', currentValue: hp }, hp));
     result.appendChild(dataCreator({ name: '霊紋', type: 'numberResource', currentValue: 22 }, 22));
-    result.appendChild(dataCreator({ name: '感情', type: 'numberResource', currentValue: 1 }, 7));
+    result.appendChild(dataCreator({ name: '感情', type: 'numberResource', currentValue: 3 }, 7));
     detailList.push(result);
   }
   {
@@ -174,7 +174,7 @@ javascript: (() => {
     txt += `:霊紋-D6 物理超越のコスト(上限3D)\n`;
     txt += `:霊紋-2D6 生命燃焼のコスト :生命力={生命燃焼時の生命力}\n`;
     txt += `:霊紋-2D6 概念破壊(コスト)\n`;
-    txt += `1D 概念破壊(上昇ランク)\n`;
+    txt += `1D6 概念破壊(上昇ランク)\n`;
     txt += `\n`;
     txt += `//---戦闘時・判定\n`;
     txt += `2D6+{命中}>=0 【命中】\n`;
