@@ -8,6 +8,18 @@
     document.querySelector('#result').value = `choice${num}[${nameList.join(',')}]`;
   });
 
+  // choiceコマンドコピーボタン
+  document.querySelector('#copy').addEventListener('click', event => {
+    navigator.clipboard.writeText(document.querySelector('#result').value)
+      .then(r => {
+        document.querySelector('#copyMessage').className = '';
+        setTimeout(() => {
+          document.querySelector('#copyMessage').className = 'hidden';
+        },
+          1000);
+      });
+  });
+
   // テーブル全体チェックボックスのセルをクリックした場合に、内部のチェックボックスの値を変更する
   document.querySelectorAll('.tableCheck').forEach(e => {
     e.addEventListener('click', event => {
