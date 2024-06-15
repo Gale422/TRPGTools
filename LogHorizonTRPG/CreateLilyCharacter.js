@@ -112,6 +112,7 @@ javascript: (() => {
         result.appendChild(dataCreator({ name: '因果力' }, json.effect || 0));
         result.appendChild(dataCreator({ name: 'ヘイト', type: 'numberResource', currentValue: 0 }, 25));
         result.appendChild(dataCreator({ name: '疲労' }, 0));
+        result.appendChild(dataCreator({ name: '初期上限HP' }, json.max_hitpoint || 0));
         detailList.push(result);
       }
       {
@@ -264,6 +265,8 @@ javascript: (() => {
         txt += `:因果力\n`;
         txt += `:HP={HP^} :障壁=0 :軽減=0 :再生=0 :ヘイト=0 初期化\n`;
         txt += `:HP+{再生}LZ 再生回復\n`;
+        txt += `:疲労+\n`;
+        txt += `:HP^={初期上限HP^}-{疲労}LZ :HP={HP}LZ 疲労適用\n`;
         txt += `\n`;
         txt += `//--- 消耗表\n`;
         txt += `PCT${json.character_rank} 体力消耗\n`;
