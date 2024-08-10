@@ -103,10 +103,9 @@ javascript: (() => {
     const hp = document.querySelector('#NP9').value;
     const mp = document.querySelector('#NP10').value;
     const san = document.querySelector('input[name="SAN_Left"]').value;
-    const sanMax = document.querySelector('input[name="SAN_Max"]').value;
     result.appendChild(dataCreator({ name: 'HP', type: 'numberResource', currentValue: hp }, hp));
     result.appendChild(dataCreator({ name: 'MP', type: 'numberResource', currentValue: mp }, mp));
-    result.appendChild(dataCreator({ name: 'SAN', type: 'numberResource', currentValue: san }, sanMax));
+    result.appendChild(dataCreator({ name: 'SAN', type: 'numberResource', currentValue: san }, san));
     result.appendChild(dataCreator({ name: '不定領域' }, document.querySelector('input[name="SAN_Danger"]').value));
     result.appendChild(dataCreator({ name: '所持金' }, document.querySelector('#money').value));
     result.appendChild(dataCreator({ name: '預金・借金' }, document.querySelector('#debt').value));
@@ -205,7 +204,7 @@ javascript: (() => {
     txt += `\n`;
     txt += `CC<={SAN} SANチェック\n`;
     txt += `:SAN-LZ SANの減少\n`;
-    txt += `:不定領域=({SAN}*4)/5 不定領域の更新\n`;
+    txt += `:不定領域=({SAN}*4)/5 :SAN^={SAN} 不定領域の更新\n`;
     txt += `\n`;
     txt += `CC<={アイディア} アイディア\n`;
     txt += `CC<={幸運} 幸運\n`;
@@ -232,7 +231,7 @@ javascript: (() => {
     txt += `\n`;
     txt += `CC<={SAN} SANチェック\n`;
     txt += `:SAN-LZ SANの減少\n`;
-    txt += `:不定領域=({SAN}*4)/5 不定領域の更新\n`;
+    txt += `:不定領域=({SAN}*4)/5 :SAN^={SAN} 不定領域の更新\n`;
     txt += `\n`;
     txt += `CCB<={アイディア} アイディア\n`;
     txt += `CCB<={幸運} 幸運\n`;
@@ -259,7 +258,7 @@ javascript: (() => {
     txt += `\n`;
     txt += `CC<={SAN} SANチェック\n`;
     txt += `:SAN-LZ SANの減少\n`;
-    txt += `:不定領域=({SAN}*4)/5 不定領域の更新\n`;
+    txt += `:不定領域=({SAN}*4)/5 :SAN^={SAN} 不定領域の更新\n`;
     txt += `\n`;
     txt += `CC<={アイディア} アイディア\n`;
     txt += `CC<={幸運} 幸運\n`;
