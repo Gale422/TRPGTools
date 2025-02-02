@@ -44,30 +44,36 @@
   width: 100%;
 }
 
+table {
+  border-spacing: 1px;
+}
+
+th,
+td {
+  border-top: 1px solid #000000;
+  border-left: 1px solid #000000;
+}
+
+table tr th:last-child,
+table tr td:last-child {
+  border-right: 1px solid #000000;
+}
+
+table tbody tr:last-child th,
+table tbody tr:last-child td {
+  border-bottom: 1px solid #000000;
+}
+
 #PLListTable,
 #OtherTable {
-  border-collapse: collapse;
-  border-spacing: 0;
   width: 40vw;
   flex-grow: 0;
   flex-shrink: 0;
 }
 
-#PLListTable,
-#PLListTable th,
-#PLListTable td {
-  border: 1px solid #000000;
-}
-
-#OtherTable,
-#OtherTable th,
-#OtherTable td {
-  border: 1px solid #000000;
-}
 
 .tableCheck,
-#PLListTable tr:not(.listNavi) td:first-child,
-#OtherTable tr:not(.listNavi) td:first-child {
+table tr:not(.listNavi) td:first-child {
   width: 30px;
   text-align: center;
 }
@@ -90,19 +96,20 @@
 }
 
 /* よく使うキャラクター名以降 */
-#savingCharaArea {
-  width: 100vw;
+#savingCharaArea,
+#addCharaArea {
   display: flex;
   flex-wrap: nowrap;
   justify-content: flex-start;
   column-gap: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 #savedCharaList {
   display: flex;
-  flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
   row-gap: 10px;
@@ -112,18 +119,25 @@
   margin-right: 20px;
 }
 
-.savedCharaData {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: flex-end;
-  column-gap: 20px;
-  border-bottom: solid #000000;
+#savedCharaList table {
+  align-self: flex-start;
 }
 
 .savedCharaName {
-  margin-right: auto;
+  padding: 5px;
 }
 
-.savedCharaGroup {
-  min-width: 20px;
+.delName {
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* マウスカーソルを指にする */
+button,
+th:has(input[type="checkbox"]),
+td:has(input[type="checkbox"]),
+.cursor {
+  cursor: pointer;
 }
