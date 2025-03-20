@@ -1,49 +1,43 @@
 javascript: (() => {
-  /* キャラシのサイト以外は処理しない */
-  const url = new URL(window.location.href);
-  if (url.hostname !== 'character-sheets.appspot.com') {
-    return;
-  }
-
-  /** ライブラリを取得する関数 */
-  const getLibraries = (...urls) => {
-    for (const url of urls) {
-      const script = document.createElement('script');
-      script.src = url;
-      document.body.appendChild(script);
+  /* サイト検証 */
+  const validateSite = () => {
+    const url = new URL(window.location.href);
+    if (url.hostname !== 'character-sheets.appspot.com') {
+      alert('このブックマークレットはサタスペキャラクターシートページでのみ使用できます。');
+      return false;
     }
+    return true;
   };
 
-  getLibraries(
-    'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js'
-  );
+  /* ブラウザ互換性チェック */
+  const validateBrowser = () => {
+    if (!window.URL || !window.XMLSerializer || !document.createElement) {
+      alert('このブラウザはサポートされていません。');
+      return false;
+    }
+    return true;
+  };
 
-  /* ZIPファイルを生成する */
-  const toZip = (fileName, charaData, chatPaletteData, buffPaletteData) => {
-    const downloadZip = (fileName, data) => {
-      if (typeof JSZip === 'undefined') {
-        setTimeout(downloadZip, 10, fileName, data);
-        return;
-      }
-      const s = new XMLSerializer();
-      let out = s.serializeToString(data);
-      out = out.replace(/xmlns=.http:\/\/www\.w3\.org\/1999\/xhtml../, '');
-      out = out.replace(/<br \/>/g, '\n');
-      out = out.replace(/currentvalue/g, 'currentValue');
-      const zip = new JSZip();
-      zip.file(`${fileName}.xml`, out);
-      zip.generateAsync({ type: 'blob' }).then(blob => saveAs(blob, `${fileName}.zip`));
-    };
+  /* キャラクターシート検証 */
+  const validateCharacterSheet = () => {
+    if (!document.querySelector('#base\\.name')) {
+      alert('キャラクターシートが正しく読み込まれていません。');
+      return false;
+    }
+    return true;
+  };
 
-    const data = document.createElement('character');
-    data.setAttribute('location.x', '0');
-    data.setAttribute('location.y', '0');
-    data.setAttribute('posz', '0');
-    data.appendChild(charaData);
-    data.appendChild(chatPaletteData);
-    data.appendChild(buffPaletteData);
-    downloadZip(fileName, data);
+  /* ライブラリを非同期に読み込む */
+  const loadLibraries = (urls) => {
+    return Promise.all(urls.map(url => {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.onload = resolve;
+        script.onerror = () => reject(new Error(`ライブラリの読み込みに失敗しました: ${url}`));
+        script.src = url;
+        document.body.appendChild(script);
+      });
+    }));
   };
 
   /* dataタグのXMLデータを作成する */
@@ -76,177 +70,60 @@ javascript: (() => {
   };
 
   /* チャットパレットを生成する */
-  const createChatPalette = (diseBotName, chatPalette) => {
+  const createChatPalette = (diceBotName, chatPalette) => {
     const xml = document.createElement('chat-palette');
-    xml.setAttribute('dicebot', diseBotName);
+    xml.setAttribute('dicebot', diceBotName);
     xml.textContent = chatPalette;
     return xml;
   };
 
   /* バフパレットを生成する */
-  const createBuffPalette = (diseBotName, buffPalette) => {
+  const createBuffPalette = (diceBotName, buffPalette) => {
     const xml = document.createElement('buff-palette');
-    xml.setAttribute('dicebot', diseBotName);
+    xml.setAttribute('dicebot', diceBotName);
     xml.textContent = buffPalette;
     return xml;
   };
 
-  /* ダイスボットを設定する */
-  const diceBotName = 'Satasupe';
-  /* キャラ名を設定する */
-  const charName = document.querySelector('#base\\.name').value;
-  /* 詳細データを追加する */
-  const detailList = [];
-
-  {
-    const result = dataCreator({ name: 'リソース' });
-    result.appendChild(dataCreator({ name: '肉体点', type: 'numberResource', currentValue: 10 - document.querySelector('#cond\\.body\\.value').value }, 10));
-    result.appendChild(dataCreator({ name: '精神点', type: 'numberResource', currentValue: 10 - document.querySelector('#cond\\.mental\\.value').value }, 10));
-    let life = document.querySelector('#base\\.abl\\.life\\.value').value;
-    result.appendChild(dataCreator({ name: 'サイフ', type: 'numberResource', currentValue: life }, life));
-    detailList.push(result);
-  }
-  {
-    const result = dataCreator({ name: '能力値' });
-    const environment = dataCreator({ name: '環境値' });
-    const heaven = dataCreator({ name: '天分値' });
-    const combat = dataCreator({ name: '戦闘値' });
-    environment.appendChild(dataCreator({ name: '犯罪' }, document.querySelector('#base\\.abl\\.crime\\.value').value));
-    environment.appendChild(dataCreator({ name: '生活' }, document.querySelector('#base\\.abl\\.life\\.value').value));
-    environment.appendChild(dataCreator({ name: '恋愛' }, document.querySelector('#base\\.abl\\.love\\.value').value));
-    environment.appendChild(dataCreator({ name: '教養' }, document.querySelector('#base\\.abl\\.culture\\.value').value));
-    environment.appendChild(dataCreator({ name: '戦闘' }, document.querySelector('#base\\.abl\\.combat\\.value').value));
-    heaven.appendChild(dataCreator({ name: '肉体' }, document.querySelector('#base\\.gift\\.body\\.value').value));
-    heaven.appendChild(dataCreator({ name: '精神' }, document.querySelector('#base\\.gift\\.mind\\.value').value));
-    combat.appendChild(dataCreator({ name: '反応力' }, document.querySelector('#base\\.power\\.initiative').value));
-    combat.appendChild(dataCreator({ name: '攻撃力' }, document.querySelector('#base\\.power\\.attack').value));
-    combat.appendChild(dataCreator({ name: '破壊力' }, document.querySelector('#base\\.power\\.destroy').value));
-    result.appendChild(environment);
-    result.appendChild(heaven);
-    result.appendChild(combat);
-    result.appendChild(dataCreator({ name: '性業値' }, document.querySelector('#base\\.emotion').value));
-    detailList.push(result);
-  }
-  {
-    const result = dataCreator({ name: `装備品(装備限界${document.querySelector('#outfitstotal\\.limit').value})` });
-    let itemIndex = 1;
-    /* 武器 */
-    Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => { return elem.querySelector('[id$=place]').value === ''; }).map(elem => {
-      return `${elem.querySelector('[id$=name]').value} 命中:${elem.querySelector('[id$=aim]').value} ダメージ:${elem.querySelector('[id$=damage]').value} 射程:${elem.querySelector('[id$=range]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
-    }).forEach(value => {
-      result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, value));
-    });
-    /* 道具 */
-    Array.from(document.querySelectorAll('#outfits tr[id^="outfits"]')).filter(elem => { return elem.querySelector('[id$=place]').value === ''; }).map(elem => {
-      return `${elem.querySelector('[id$=name]').value} 使用:${elem.querySelector('[id$=use]').value} 効果:${elem.querySelector('[id$=effect]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
-    }).forEach(value => {
-      result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, value));
-    });
-    /* 乗物 */
-    Array.from(document.querySelectorAll('#vehicles tr[id^="vehicles"]')).map(elem => {
-      return `${elem.querySelector('[id$=name]').value} スピード:${elem.querySelector('[id$=speed]').value} 車体:${elem.querySelector('[id$=frame]').value} 荷物:${elem.querySelector('[id$=burden]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
-    }).forEach(value => {
-      result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, value));
-    });
-    for (; itemIndex <= document.querySelector('#outfitstotal\\.limit').value;) {
-      result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, ''));
-    }
-    detailList.push(result);
-  }
-  {
-    Array.from(document.querySelectorAll('#vehicles tr[id^="vehicles"]')).map(elem => {
-      return { text: `乗物:${elem.querySelector('[id$=name]').value} (荷物:${elem.querySelector('[id$=burden]').value})`, burden: elem.querySelector('[id$=burden]').value };
-    }).forEach(value => {
-      const result = dataCreator({ name: value.text });
-      let itemIndex = 1;
-      /* 武器 */
-      Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => { return elem.querySelector('[id$=place]').value === '乗物'; }).map(elem => {
-        return `${elem.querySelector('[id$=name]').value} 命中:${elem.querySelector('[id$=aim]').value} ダメージ:${elem.querySelector('[id$=damage]').value} 射程:${elem.querySelector('[id$=range]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
-      }).forEach(value => {
-        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
-      });
-      /* 道具 */
-      Array.from(document.querySelectorAll('#outfits tr[id^="outfits"]')).filter(elem => { return elem.querySelector('[id$=place]').value === '乗物'; }).map(elem => {
-        return `${elem.querySelector('[id$=name]').value} 使用:${elem.querySelector('[id$=use]').value} 効果:${elem.querySelector('[id$=effect]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
-      }).forEach(value => {
-        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
-      });
-      for (; itemIndex <= value.burden;) {
-        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, ''));
+  /* ZIPファイル作成とダウンロード */
+  const createZipFile = (fileName, charaData, chatPaletteData, buffPaletteData) => {
+    /* 内部関数: 実際のZIPファイル作成とダウンロード処理 */
+    const downloadZip = (fileName, data) => {
+      if (typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
+        setTimeout(() => downloadZip(fileName, data), 100);
+        return;
       }
-      detailList.push(result);
-    });
-  }
-  {
-    const result = dataCreator({ name: 'アジト' });
-    let itemIndex = 1;
-    /* 武器 */
-    Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => { return elem.querySelector('[id$=place]').value === 'アジト'; }).map(elem => {
-      return `${elem.querySelector('[id$=name]').value} 命中:${elem.querySelector('[id$=aim]').value} ダメージ:${elem.querySelector('[id$=damage]').value} 射程:${elem.querySelector('[id$=range]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
-    }).forEach((value, index) => {
-      result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
-    });
-    /* 道具 */
-    Array.from(document.querySelectorAll('#outfits tr[id^="outfits"]')).filter(elem => { return elem.querySelector('[id$=place]').value === 'アジト'; }).map(elem => {
-      return `${elem.querySelector('[id$=name]').value} 使用:${elem.querySelector('[id$=use]').value} 効果:${elem.querySelector('[id$=effect]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
-    }).forEach(value => {
-      result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
-    });
-    for (; itemIndex <= 10;) {
-      result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, ''));
-    }
-    detailList.push(result);
-  }
-  {
-    const result = dataCreator({ name: '異能' });
-    Array.from(document.querySelectorAll('#karma tr[id^="karma"]')).forEach(elem => {
-      result.appendChild(dataCreator({ name: elem.querySelector('[id$=name]').value }, `${elem.querySelector('[id$="price.name"]').value} 使用:${elem.querySelector('[id$="price.use"]').value} 対象:${elem.querySelector('[id$="price.target"]').value} 判定:${elem.querySelector('[id$="price.judge"]').value} 効果:${elem.querySelector('[id$="price.effect"]').value}`));
-    });
-    detailList.push(result);
-  }
-  {
-    const result = dataCreator({ name: '代償' });
-    Array.from(document.querySelectorAll('#karma tr[id^="karma"]')).forEach(elem => {
-      result.appendChild(dataCreator({ name: elem.querySelector('[id$=name]').value }, `${elem.querySelector('[id$="talent.name"]').value} 使用:${elem.querySelector('[id$="talent.use"]').value} 対象:${elem.querySelector('[id$="talent.target"]').value} 判定:${elem.querySelector('[id$="talent.judge"]').value} 効果:${elem.querySelector('[id$="talent.effect"]').value}`));
-    });
-    detailList.push(result);
-  }
-  {
-    const result = dataCreator({ name: 'パーソナル' });
-    result.appendChild(dataCreator({ name: '故郷' }, document.querySelector('#base\\.homeland').value));
-    result.appendChild(dataCreator({ name: '性別' }, document.querySelector('#base\\.sex').value));
-    result.appendChild(dataCreator({ name: '年齢' }, document.querySelector('#base\\.age').value));
-    result.appendChild(dataCreator({ name: '外見' }, document.querySelector('#base\\.style').value));
-    result.appendChild(dataCreator({ name: 'チーム' }, document.querySelector('#base\\.team').value));
-    result.appendChild(dataCreator({ name: '表の顔' }, document.querySelector('#base\\.surface').value));
-    result.appendChild(dataCreator({ name: '盟約' }, document.querySelector('#base\\.alliance').value));
-    result.appendChild(dataCreator({ name: '階級' }, document.querySelector('#base\\.hierarchy').value));
-    result.appendChild(dataCreator({ name: '好きなもの' }, document.querySelector('#base\\.likes').value));
-    result.appendChild(dataCreator({ name: '嫌いなもの' }, document.querySelector('#base\\.dislikes').value));
-    result.appendChild(dataCreator({ name: '好みのタイプ' }, document.querySelector('#base\\.favorites').value));
-    result.appendChild(dataCreator({ name: '好きな映画' }, document.querySelector('#base\\.movie').value));
-    result.appendChild(dataCreator({ name: '言語' }, document.querySelector('#base\\.langueges').value));
-    detailList.push(result);
-  }
-  {
-    const result = dataCreator({ name: 'その他' });
-    const state = dataCreator({ name: '状態' });
-    const hideout = dataCreator({ name: 'アジト' });
-    state.appendChild(dataCreator({ name: 'トラウマ' }, document.querySelector('#cond\\.trauma\\.value').value));
-    state.appendChild(dataCreator({ name: '中毒' }, document.querySelector('#cond\\.addiction\\.value').value));
-    state.appendChild(dataCreator({ name: 'トリコ' }, document.querySelector('#cond\\.prisoner\\.value').value));
-    state.appendChild(dataCreator({ name: 'SAN' }, document.querySelector('#cond\\.san\\.value').value));
-    state.appendChild(dataCreator({ name: 'クトゥルフ神話' }, document.querySelector('#cond\\.cthulhu\\.value').value));
-    hideout.appendChild(dataCreator({ name: '場所' }, document.querySelector('#home\\.place').value));
-    hideout.appendChild(dataCreator({ name: '快適度' }, document.querySelector('#home\\.comfortable').value));
-    hideout.appendChild(dataCreator({ name: 'セキュリティ' }, document.querySelector('#home\\.security').value));
-    result.appendChild(dataCreator({ name: '趣味' }, Array.from(document.querySelectorAll('#div\\.hobby .input.selected span'), elem => elem.textContent).join(',')));
-    result.appendChild(state);
-    result.appendChild(hideout);
-    detailList.push(result);
-  }
 
-  /* チャットパレットの文字列 */
+      const serializer = new XMLSerializer();
+      let xmlString = serializer.serializeToString(data);
+
+      /* XMLデータの整形 */
+      xmlString = xmlString.replace(/xmlns=.http:\/\/www\.w3\.org\/1999\/xhtml../, '');
+      xmlString = xmlString.replace(/<br \/>/g, '\n');
+      xmlString = xmlString.replace(/currentvalue/g, 'currentValue');
+
+      const zip = new JSZip();
+      zip.file(`${fileName}.xml`, xmlString);
+      zip.generateAsync({ type: 'blob' }).then(blob => saveAs(blob, `${fileName}.zip`));
+    };
+
+    const data = document.createElement('character');
+    data.setAttribute('location.x', '0');
+    data.setAttribute('location.y', '0');
+    data.setAttribute('posz', '0');
+    data.appendChild(charaData);
+    data.appendChild(chatPaletteData);
+    data.appendChild(buffPaletteData);
+    downloadZip(fileName, data);
+  };
+
+  /* DOM要素を安全に取得する関数 */
+  const getElementValue = (selector, defaultValue = '0') => {
+    const element = document.querySelector(selector);
+    return element?.value || defaultValue;
+  };
+
+  /* チャットパレットテキストの生成 */
   const getChatPaletteText = () => {
     let txt = '';
     txt += `//--- 判定\n`;
@@ -284,7 +161,7 @@ javascript: (() => {
       };
     }).forEach(value => {
       txt += `({攻撃力}+0{肉体重傷}{精神重傷})R>=${value.aim}[,1,13] 攻撃判定(${value.name || '武器名'}) ${value.range || '射程未設定'} 【${value.notes || '特殊機能無し'}】\n`;
-      if(value.range === '格闘') {
+      if (value.range === '格闘') {
         txt += `C({破壊力}+) ダメージ(${value.name || '武器名'})\n`;
       } else {
         txt += `C(${value.damage}) ダメージ(${value.name || '武器名'})\n`;
@@ -341,14 +218,257 @@ javascript: (() => {
     return txt;
   };
 
-  /* バフパレットの文字列 */
+  /* バフパレットテキストの生成 */
   const getBuffPaletteText = () => {
-    let txt = '';
-    return txt;
+    return '';
   };
 
-  const chara = createCharacter(charName, detailList);
-  const chatPalette = createChatPalette(diceBotName, getChatPaletteText());
-  const buffPalette = createBuffPalette(diceBotName, getBuffPaletteText());
-  toZip(charName, chara, chatPalette, buffPalette);
+  /* キャラクターの詳細データ要素を生成 */
+  const createCharacterDetailElements = () => {
+    const detailList = [];
+
+    {
+      const result = dataCreator({ name: 'リソース' });
+      result.appendChild(dataCreator({ name: '肉体点', type: 'numberResource', currentValue: 10 - getElementValue('#cond\\.body\\.value', '0') }, 10));
+      result.appendChild(dataCreator({ name: '精神点', type: 'numberResource', currentValue: 10 - getElementValue('#cond\\.mental\\.value', '0') }, 10));
+      let life = getElementValue('#base\\.abl\\.life\\.value', '0');
+      result.appendChild(dataCreator({ name: 'サイフ', type: 'numberResource', currentValue: life }, life));
+      detailList.push(result);
+    }
+
+    {
+      const result = dataCreator({ name: '能力値' });
+      const environment = dataCreator({ name: '環境値' });
+      const heaven = dataCreator({ name: '天分値' });
+      const combat = dataCreator({ name: '戦闘値' });
+
+      environment.appendChild(dataCreator({ name: '犯罪' }, getElementValue('#base\\.abl\\.crime\\.value', '0')));
+      environment.appendChild(dataCreator({ name: '生活' }, getElementValue('#base\\.abl\\.life\\.value', '0')));
+      environment.appendChild(dataCreator({ name: '恋愛' }, getElementValue('#base\\.abl\\.love\\.value', '0')));
+      environment.appendChild(dataCreator({ name: '教養' }, getElementValue('#base\\.abl\\.culture\\.value', '0')));
+      environment.appendChild(dataCreator({ name: '戦闘' }, getElementValue('#base\\.abl\\.combat\\.value', '0')));
+
+      heaven.appendChild(dataCreator({ name: '肉体' }, getElementValue('#base\\.gift\\.body\\.value', '0')));
+      heaven.appendChild(dataCreator({ name: '精神' }, getElementValue('#base\\.gift\\.mind\\.value', '0')));
+
+      combat.appendChild(dataCreator({ name: '反応力' }, getElementValue('#base\\.power\\.initiative', '0')));
+      combat.appendChild(dataCreator({ name: '攻撃力' }, getElementValue('#base\\.power\\.attack', '0')));
+      combat.appendChild(dataCreator({ name: '破壊力' }, getElementValue('#base\\.power\\.destroy', '0')));
+
+      result.appendChild(environment);
+      result.appendChild(heaven);
+      result.appendChild(combat);
+      result.appendChild(dataCreator({ name: '性業値' }, getElementValue('#base\\.emotion', '0')));
+      detailList.push(result);
+    }
+
+    {
+      const result = dataCreator({ name: `装備品(装備限界${getElementValue('#outfitstotal\\.limit', '0')})` });
+      let itemIndex = 1;
+
+      /* 武器 */
+      Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => {
+        return elem.querySelector('[id$=place]').value === '';
+      }).map(elem => {
+        return `${elem.querySelector('[id$=name]').value} 命中:${elem.querySelector('[id$=aim]').value} ダメージ:${elem.querySelector('[id$=damage]').value} 射程:${elem.querySelector('[id$=range]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
+      }).forEach(value => {
+        result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, value));
+      });
+
+      /* 道具 */
+      Array.from(document.querySelectorAll('#outfits tr[id^="outfits"]')).filter(elem => {
+        return elem.querySelector('[id$=place]').value === '';
+      }).map(elem => {
+        return `${elem.querySelector('[id$=name]').value} 使用:${elem.querySelector('[id$=use]').value} 効果:${elem.querySelector('[id$=effect]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
+      }).forEach(value => {
+        result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, value));
+      });
+
+      /* 乗物 */
+      Array.from(document.querySelectorAll('#vehicles tr[id^="vehicles"]')).map(elem => {
+        return `${elem.querySelector('[id$=name]').value} スピード:${elem.querySelector('[id$=speed]').value} 車体:${elem.querySelector('[id$=frame]').value} 荷物:${elem.querySelector('[id$=burden]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
+      }).forEach(value => {
+        result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, value));
+      });
+
+      /* 残りの枠を埋める */
+      for (; itemIndex <= getElementValue('#outfitstotal\\.limit', '0');) {
+        result.appendChild(dataCreator({ name: `装備品${itemIndex++}` }, ''));
+      }
+
+      detailList.push(result);
+    }
+
+    /* 乗物内のアイテム情報を追加 */
+    Array.from(document.querySelectorAll('#vehicles tr[id^="vehicles"]')).map(elem => {
+      return {
+        text: `乗物:${elem.querySelector('[id$=name]').value} (荷物:${elem.querySelector('[id$=burden]').value})`,
+        burden: elem.querySelector('[id$=burden]').value
+      };
+    }).forEach(value => {
+      const result = dataCreator({ name: value.text });
+      let itemIndex = 1;
+
+      /* 武器 */
+      Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => {
+        return elem.querySelector('[id$=place]').value === '乗物';
+      }).map(elem => {
+        return `${elem.querySelector('[id$=name]').value} 命中:${elem.querySelector('[id$=aim]').value} ダメージ:${elem.querySelector('[id$=damage]').value} 射程:${elem.querySelector('[id$=range]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
+      }).forEach(value => {
+        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
+      });
+
+      /* 道具 */
+      Array.from(document.querySelectorAll('#outfits tr[id^="outfits"]')).filter(elem => {
+        return elem.querySelector('[id$=place]').value === '乗物';
+      }).map(elem => {
+        return `${elem.querySelector('[id$=name]').value} 使用:${elem.querySelector('[id$=use]').value} 効果:${elem.querySelector('[id$=effect]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
+      }).forEach(value => {
+        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
+      });
+
+      /* 残りの枠を埋める */
+      for (; itemIndex <= value.burden;) {
+        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, ''));
+      }
+
+      detailList.push(result);
+    });
+
+    /* アジト内のアイテム情報を追加 */
+    {
+      const result = dataCreator({ name: 'アジト' });
+      let itemIndex = 1;
+
+      /* 武器 */
+      Array.from(document.querySelectorAll('#weapons tr[id^="weapons"]')).filter(elem => {
+        return elem.querySelector('[id$=place]').value === 'アジト';
+      }).map(elem => {
+        return `${elem.querySelector('[id$=name]').value} 命中:${elem.querySelector('[id$=aim]').value} ダメージ:${elem.querySelector('[id$=damage]').value} 射程:${elem.querySelector('[id$=range]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
+      }).forEach(value => {
+        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
+      });
+
+      /* 道具 */
+      Array.from(document.querySelectorAll('#outfits tr[id^="outfits"]')).filter(elem => {
+        return elem.querySelector('[id$=place]').value === 'アジト';
+      }).map(elem => {
+        return `${elem.querySelector('[id$=name]').value} 使用:${elem.querySelector('[id$=use]').value} 効果:${elem.querySelector('[id$=effect]').value} 特殊機能:${elem.querySelector('[id$=notes]').value}`;
+      }).forEach(value => {
+        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, value));
+      });
+
+      /* 残りの枠を埋める */
+      for (; itemIndex <= 10;) {
+        result.appendChild(dataCreator({ name: `アイテム${itemIndex++}` }, ''));
+      }
+
+      detailList.push(result);
+    }
+
+    /* 異能情報を追加 */
+    {
+      const result = dataCreator({ name: '異能' });
+
+      Array.from(document.querySelectorAll('#karma tr[id^="karma"]')).forEach(elem => {
+        result.appendChild(dataCreator({ name: elem.querySelector('[id$=name]').value },
+          `${elem.querySelector('[id$="price.name"]').value} 使用:${elem.querySelector('[id$="price.use"]').value} 対象:${elem.querySelector('[id$="price.target"]').value} 判定:${elem.querySelector('[id$="price.judge"]').value} 効果:${elem.querySelector('[id$="price.effect"]').value}`));
+      });
+
+      detailList.push(result);
+    }
+
+    /* 代償情報を追加 */
+    {
+      const result = dataCreator({ name: '代償' });
+
+      Array.from(document.querySelectorAll('#karma tr[id^="karma"]')).forEach(elem => {
+        result.appendChild(dataCreator({ name: elem.querySelector('[id$=name]').value },
+          `${elem.querySelector('[id$="talent.name"]').value} 使用:${elem.querySelector('[id$="talent.use"]').value} 対象:${elem.querySelector('[id$="talent.target"]').value} 判定:${elem.querySelector('[id$="talent.judge"]').value} 効果:${elem.querySelector('[id$="talent.effect"]').value}`));
+      });
+
+      detailList.push(result);
+    }
+
+    /* パーソナル情報を追加 */
+    {
+      const result = dataCreator({ name: 'パーソナル' });
+
+      result.appendChild(dataCreator({ name: '故郷' }, getElementValue('#base\\.homeland', '')));
+      result.appendChild(dataCreator({ name: '性別' }, getElementValue('#base\\.sex', '')));
+      result.appendChild(dataCreator({ name: '年齢' }, getElementValue('#base\\.age', '')));
+      result.appendChild(dataCreator({ name: '外見' }, getElementValue('#base\\.style', '')));
+      result.appendChild(dataCreator({ name: 'チーム' }, getElementValue('#base\\.team', '')));
+      result.appendChild(dataCreator({ name: '表の顔' }, getElementValue('#base\\.surface', '')));
+      result.appendChild(dataCreator({ name: '盟約' }, getElementValue('#base\\.alliance', '')));
+      result.appendChild(dataCreator({ name: '階級' }, getElementValue('#base\\.hierarchy', '')));
+      result.appendChild(dataCreator({ name: '好きなもの' }, getElementValue('#base\\.likes', '')));
+      result.appendChild(dataCreator({ name: '嫌いなもの' }, getElementValue('#base\\.dislikes', '')));
+      result.appendChild(dataCreator({ name: '好みのタイプ' }, getElementValue('#base\\.favorites', '')));
+      result.appendChild(dataCreator({ name: '好きな映画' }, getElementValue('#base\\.movie', '')));
+      result.appendChild(dataCreator({ name: '言語' }, getElementValue('#base\\.langueges', '')));
+
+      detailList.push(result);
+    }
+
+    /* その他情報を追加 */
+    {
+      const result = dataCreator({ name: 'その他' });
+      const state = dataCreator({ name: '状態' });
+      const hideout = dataCreator({ name: 'アジト' });
+
+      state.appendChild(dataCreator({ name: 'トラウマ' }, getElementValue('#cond\\.trauma\\.value', '0')));
+      state.appendChild(dataCreator({ name: '中毒' }, getElementValue('#cond\\.addiction\\.value', '0')));
+      state.appendChild(dataCreator({ name: 'トリコ' }, getElementValue('#cond\\.prisoner\\.value', '0')));
+      state.appendChild(dataCreator({ name: 'SAN' }, getElementValue('#cond\\.san\\.value', '0')));
+      state.appendChild(dataCreator({ name: 'クトゥルフ神話' }, getElementValue('#cond\\.cthulhu\\.value', '0')));
+
+      hideout.appendChild(dataCreator({ name: '場所' }, getElementValue('#home\\.place', '')));
+      hideout.appendChild(dataCreator({ name: '快適度' }, getElementValue('#home\\.comfortable', '')));
+      hideout.appendChild(dataCreator({ name: 'セキュリティ' }, getElementValue('#home\\.security', '')));
+
+      result.appendChild(dataCreator({ name: '趣味' }, Array.from(document.querySelectorAll('#div\\.hobby .input.selected span'), elem => elem.textContent).join(',')));
+      result.appendChild(state);
+      result.appendChild(hideout);
+
+      detailList.push(result);
+    }
+
+    return [getElementValue('#base\\.name', 'NoName'), detailList];
+  };
+
+  /* メイン処理 */
+  const main = async () => {
+    try {
+      /* サイトとブラウザの検証 */
+      if (!validateSite() || !validateBrowser()) return;
+
+      /* ライブラリ読み込み */
+      await loadLibraries([
+        'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js'
+      ]);
+
+      /* キャラクターシート検証 */
+      if (!validateCharacterSheet()) return;
+
+      /* キャラクターデータの生成 */
+      const [charaName, detailElements] = createCharacterDetailElements();
+
+      /* チャットパレットとバフパレットの生成 */
+      const chatPaletteElement = createChatPalette('Satasupe', getChatPaletteText());
+      const buffPaletteElement = createBuffPalette('Satasupe', getBuffPaletteText());
+
+      /* キャラクターデータの生成と保存 */
+      const characterElement = createCharacter(charaName, detailElements);
+      createZipFile(charaName, characterElement, chatPaletteElement, buffPaletteElement);
+
+    } catch (error) {
+      console.error('エラーが発生しました:', error);
+      alert(`処理中にエラーが発生しました: ${error.message}`);
+    }
+  };
+
+  /* メイン処理実行 */
+  main();
 })();
