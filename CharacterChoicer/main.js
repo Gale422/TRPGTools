@@ -167,7 +167,7 @@
     // 既存行に追加できるかどうかを確認
     const emptyInputs = Array.from(
       getElements(`${DOM_SELECTORS.PL_LIST_TABLE} tbody tr:not(.listNavi) input.charaName`)
-    ).reverse().filter(input => input.value === '');
+    ).filter(input => input.value === '');
 
     const listNavi = getElement(`${DOM_SELECTORS.PL_LIST_TABLE} tbody tr.listNavi`);
     const plListTableBody = getElement(`${DOM_SELECTORS.PL_LIST_TABLE} tbody`);
