@@ -1,135 +1,329 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ココフォリア用キャラクター選択ツール</title>
-  </head>
-
-  <body>
-    <h1>キャラクター選択ツール</h1>
-    <div id="copyMessage" class="hidden">コピーしました</div>
-    <div id="flexBox">
-      <div id="ControlArea">
-        <div>選択するキャラクター数を入力：<input type="number" id="choiceNum"></div>
-        <div><button type="button" id="create">作成</button></div>
-        <div><button type="button" id="copy">コピー</button></div>
-        <div><input type="text" id="result"></div>
-      </div>
-      <table id="PLListTable">
-        <thead>
-          <tr>
-            <th class="tableCheck"><input type="checkbox"></th>
-            <th>PLキャラクターの名称</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr class="listNavi">
-            <td colspan="2">
-              <div>
-                <button type="button" class="place">+</button><button type="button" class="minus">-</button><button type="button" class="nameDel">名称全削除</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <table id="OtherTable">
-        <thead>
-          <tr>
-            <th class="tableCheck"><input type="checkbox"></th>
-            <th>その他(エネミー等)の名称</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr>
-            <td class="charaCheck"><input type="checkbox"></td>
-            <td><input type="text" class="charaName"></td>
-          </tr>
-          <tr class="listNavi">
-            <td colspan="2">
-              <div>
-                <button type="button" class="place">+</button><button type="button" class="minus">-</button><button type="button" class="nameDel">名称全削除</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <h2>よく使うキャラクター名</h2>
-    <div>よく使うキャラ名を入力し、保存しておくことができます。追加ボタンでPLキャラクターの名称の最後に追加します。削除ボタンで一覧から削除します。</div>
-    <div>ブラウザに保存するため、表示するブラウザを変更すると以前のデータを使用できなくなります。（元のブラウザで表示すると再度使用できます。）</div>
-    <div id="savingCharaArea">
-      <div>キャラ名：<input type="text" id="savingCharaName"></div>
-      <div>分類：<input type="text" id="savingCharaGroup"></div>
-      <div><button type="button" id="save">保存</button></div>
-    </div>
-    <div id="addCharaArea">
-      <div><button type="button" id="addName">選択したキャラクターを上のテーブルに追加する</button></div>
-    </div>
-    <div id="savedCharaList"></div>
-    <template id="charaTemplate">
-      <tr>
-        <td class="charaCheck"><input type="checkbox"></td>
-        <td><input type="text" class="charaName"></td>
-      </tr>
-    </template>
-    <template id="savedCharaTableTemplate">
-      <table class="groupTable">
-        <thead>
-          <tr>
-            <th class="tableCheck"><input type="checkbox"></th>
-            <th colspan="2" class="groupName cursor"></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </template>
-    <template id="savedCharaTemplate">
-      <tr>
-        <td class="charaCheck"><input type="checkbox"></td>
-        <td class="savedCharaName cursor"></td>
-        <td class="delName">
-          <svg class="del-icon cursor" version="1.1" id="_x32_" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="width: 24px; height: 24px; opacity: 1;" xml:space="preserve">
-            <style type="text/css">.st0{fill:#4B4B4B;} </style>
-            <g>
-              <path class="st0" d="M439.114,69.747c0,0,2.977,2.1-43.339-11.966c-41.52-12.604-80.795-15.309-80.795-15.309l-2.722-19.297 C310.387,9.857,299.484,0,286.642,0h-30.651h-30.651c-12.825,0-23.729,9.857-25.616,23.175l-2.722,19.297 c0,0-39.258,2.705-80.778,15.309C69.891,71.848,72.868,69.747,72.868,69.747c-10.324,2.849-17.536,12.655-17.536,23.864v16.695 h200.66h200.677V93.611C456.669,82.402,449.456,72.596,439.114,69.747z" style="fill: rgb(75, 75, 75);"></path>
-              <path class="st0" d="M88.593,464.731C90.957,491.486,113.367,512,140.234,512h231.524c26.857,0,49.276-20.514,51.64-47.269 l25.642-327.21H62.952L88.593,464.731z M342.016,209.904c0.51-8.402,7.731-14.807,16.134-14.296 c8.402,0.51,14.798,7.731,14.296,16.134l-14.492,239.493c-0.51,8.402-7.731,14.798-16.133,14.288 c-8.403-0.51-14.806-7.722-14.296-16.125L342.016,209.904z M240.751,210.823c0-8.42,6.821-15.241,15.24-15.241 c8.42,0,15.24,6.821,15.24,15.241v239.492c0,8.42-6.821,15.24-15.24,15.24c-8.42,0-15.24-6.821-15.24-15.24V210.823z M153.833,195.608c8.403-0.51,15.624,5.894,16.134,14.296l14.509,239.492c0.51,8.403-5.894,15.615-14.296,16.125 c-8.403,0.51-15.624-5.886-16.134-14.288l-14.509-239.493C139.026,203.339,145.43,196.118,153.833,195.608z" style="fill: rgb(75, 75, 75);"></path>
-            </g>
-          </svg>
-        </td>
-      </tr>
-    </template>
-  </body>
-  <script src="main.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ココフォリア用のchoiceコマンド生成ツール。キャラクター名を管理してchoiceコマンドを簡単に作成できます。">
+  <title>キャラクター選択ツール - Cocofolia Choice Command Generator</title>
   <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main>
+    <!-- ヘッダー -->
+    <header>
+      <h1>🎲 キャラクター選択ツール</h1>
+      <p>ココフォリア用のchoiceコマンドを簡単に作成</p>
+    </header>
+
+    <!-- キャラクター入力・選択セクション -->
+    <section id="flexBox">
+      <!-- コントロールエリア -->
+      <aside id="ControlArea" role="complementary" aria-label="コマンド生成コントロール">
+        <div>
+          <label for="num">選択するキャラクター数：</label>
+          <input
+            type="number"
+            id="num"
+            value="1"
+            min="1"
+            aria-label="選択数"
+          >
+        </div>
+
+        <div>
+          <button type="button" id="create" aria-label="choiceコマンドを作成">
+            ✨ 作成
+          </button>
+        </div>
+
+        <div>
+          <button type="button" id="copyBtn" aria-label="コマンドをクリップボードにコピー">
+            📋 コピー
+          </button>
+        </div>
+
+        <div>
+          <label for="result">生成されたコマンド：</label>
+          <input
+            type="text"
+            id="result"
+            readonly
+            aria-label="生成されたchoiceコマンド"
+            placeholder="コマンドがここに生成されます"
+          >
+        </div>
+
+        <div id="copyMessage" class="hidden" role="status" aria-live="polite">
+          コピーしました！
+        </div>
+      </aside>
+
+      <!-- コマンド履歴アコーディオン -->
+      <aside id="historyAccordion" class="history-accordion" role="region" aria-label="choiceコマンド履歴">
+        <button
+          type="button"
+          id="historyToggle"
+          class="history-toggle"
+          aria-expanded="false"
+          aria-controls="historyContent"
+        >
+          <span class="toggle-icon">▼</span>
+          <span>📜 コマンド履歴（最大10件）</span>
+        </button>
+        <div id="historyContent" class="history-content">
+          <div class="history-header">
+            <button type="button" class="history-clear-all" aria-label="履歴を全て削除">
+              🗑️ 全削除
+            </button>
+          </div>
+          <div id="historyList" class="history-list">
+            <div class="no-history">履歴はありません</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- PLキャラクターテーブル -->
+      <section id="PLListTable" aria-labelledby="pl-table-title">
+        <table>
+          <thead>
+            <tr>
+              <th class="drag-handle-header"></th>
+              <th class="tableCheck">
+                <input type="checkbox" aria-label="PLキャラクター全選択">
+              </th>
+              <th id="pl-table-title">PLキャラクターの名称</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr class="listNavi">
+              <td colspan="3">
+                <div role="group" aria-label="行操作">
+                  <button type="button" class="place" aria-label="行を追加">+</button>
+                  <button type="button" class="minus" aria-label="行を削除">-</button>
+                  <button type="button" class="nameDel" aria-label="名称を全削除">名称全削除</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- エネミーテーブル -->
+      <section id="OtherTable" aria-labelledby="other-table-title">
+        <table>
+          <thead>
+            <tr>
+              <th class="drag-handle-header"></th>
+              <th class="tableCheck">
+                <input type="checkbox" aria-label="その他全選択">
+              </th>
+              <th id="other-table-title">その他（エネミー等）の名称</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr>
+              <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+              <td class="charaCheck">
+                <input type="checkbox" aria-label="キャラクター選択">
+              </td>
+              <td>
+                <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+              </td>
+            </tr>
+            <tr class="listNavi">
+              <td colspan="3">
+                <div role="group" aria-label="行操作">
+                  <button type="button" class="place" aria-label="行を追加">+</button>
+                  <button type="button" class="minus" aria-label="行を削除">-</button>
+                  <button type="button" class="nameDel" aria-label="名称を全削除">名称全削除</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </section>
+
+    <!-- よく使うキャラクター名セクション -->
+    <section aria-labelledby="saved-characters-section">
+      <h2 id="saved-characters-section">💾 よく使うキャラクター名</h2>
+
+      <div>
+        よく使うキャラ名を入力し、保存しておくことができます。「追加」ボタンでPLキャラクターの名称の最後に追加します。削除ボタンで一覧から削除します。
+      </div>
+
+      <div>
+        ⚠️ ブラウザに保存するため、表示するブラウザを変更すると以前のデータを使用できなくなります。（元のブラウザで表示すると再度使用できます。）
+      </div>
+
+      <!-- キャラクター保存フォーム -->
+      <form id="savingCharaArea" onsubmit="return false;" role="form" aria-label="キャラクター保存フォーム">
+        <div>
+          <label for="savingCharaName">キャラ名：</label>
+          <input
+            type="text"
+            id="savingCharaName"
+            aria-label="保存するキャラクター名"
+          >
+        </div>
+        <div>
+          <label for="savingCharaGroup">分類：</label>
+          <input
+            type="text"
+            id="savingCharaGroup"
+            aria-label="キャラクターの分類"
+          >
+        </div>
+        <div>
+          <button type="button" id="save" aria-label="キャラクターを保存">
+            💾 保存
+          </button>
+        </div>
+      </form>
+
+      <!-- キャラクター追加ボタン -->
+      <div id="addCharaArea" role="group" aria-label="キャラクター追加操作">
+        <div>
+          <button type="button" id="addName" aria-label="選択したキャラクターをテーブルに追加">
+            ➕ 選択したキャラクターを上のテーブルに追加する
+          </button>
+        </div>
+      </div>
+
+      <!-- 保存済みキャラクター一覧 -->
+      <div id="savedCharaList" role="region" aria-label="保存済みキャラクター一覧"></div>
+    </section>
+  </main>
+
+  <!-- テンプレート -->
+  <template id="newRowTemplate">
+    <tr>
+      <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+      <td class="charaCheck">
+        <input type="checkbox" aria-label="キャラクター選択">
+      </td>
+      <td>
+        <input type="text" class="charaName" aria-label="キャラクター名" placeholder="キャラクター名を入力">
+      </td>
+    </tr>
+  </template>
+
+  <template id="savedCharaTableTemplate">
+    <table class="groupTable">
+      <thead>
+        <tr>
+          <th class="drag-handle-header"></th>
+          <th class="tableCheck">
+            <input type="checkbox" aria-label="グループ全選択">
+          </th>
+          <th colspan="2" class="groupName cursor" role="button" tabindex="0"></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </template>
+
+  <template id="savedCharaTemplate">
+    <tr>
+      <td class="drag-handle" aria-label="ドラッグハンドル" title="ドラッグして並び替え">⋮⋮</td>
+      <td class="charaCheck">
+        <input type="checkbox" aria-label="キャラクター選択">
+      </td>
+      <td class="savedCharaName cursor" role="button" tabindex="0"></td>
+      <td class="delName" role="button" aria-label="キャラクターを削除" tabindex="0">
+        <svg class="del-icon cursor" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve" aria-hidden="true">
+          <style type="text/css">.st0{fill:#4B4B4B;}</style>
+          <g>
+            <path class="st0" d="M439.114,69.747c0,0,2.977,2.1-43.339-11.966c-41.52-12.604-80.795-15.309-80.795-15.309l-2.722-19.297 C310.387,9.857,299.484,0,286.642,0h-30.651h-30.651c-12.825,0-23.729,9.857-25.616,23.175l-2.722,19.297 c0,0-39.258,2.705-80.778,15.309C69.891,71.848,72.868,69.747,72.868,69.747c-10.324,2.849-17.536,12.655-17.536,23.864v16.695 h200.66h200.677V93.611C456.669,82.402,449.456,72.596,439.114,69.747z"></path>
+            <path class="st0" d="M88.593,464.731C90.957,491.486,113.367,512,140.234,512h231.524c26.857,0,49.276-20.514,51.64-47.269 l25.642-327.21H62.952L88.593,464.731z M342.016,209.904c0.51-8.402,7.731-14.807,16.134-14.296 c8.402,0.51,14.798,7.731,14.296,16.134l-14.492,239.493c-0.51,8.402-7.731,14.798-16.133,14.288 c-8.403-0.51-14.806-7.722-14.296-16.125L342.016,209.904z M240.751,210.823c0-8.42,6.821-15.241,15.24-15.241 c8.42,0,15.24,6.821,15.24,15.241v239.492c0,8.42-6.821,15.24-15.24,15.24c-8.42,0-15.24-6.821-15.24-15.24V210.823z M153.833,195.608c8.403-0.51,15.624,5.894,16.134,14.296l14.509,239.492c0.51,8.403-5.894,15.615-14.296,16.125 c-8.403,0.51-15.624-5.886-16.134-14.288l-14.509-239.493C139.026,203.339,145.43,196.118,153.833,195.608z"></path>
+          </g>
+        </svg>
+      </td>
+    </tr>
+  </template>
+
+  <template id="historyItemTemplate">
+    <div class="history-item">
+      <span class="history-index"></span>
+      <span class="history-timestamp-absolute"></span>
+      <span class="history-timestamp-relative"></span>
+      <button type="button" class="history-copy-btn" aria-label="コピー" title="コピー">
+        📋
+      </button>
+      <code class="history-command"></code>
+      <button type="button" class="history-delete-btn" aria-label="この履歴を削除" title="削除">
+        ✕
+      </button>
+    </div>
+  </template>
+
+  <!-- JavaScriptの読み込み -->
+  <script src="main.js"></script>
+</body>
 
 </html>
