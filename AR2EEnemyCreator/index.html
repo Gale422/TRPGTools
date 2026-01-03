@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アリアンロッド2E エネミー作成ツール</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>アリアンロッド2E エネミー作成ツール</h1>
+      <p class="subtitle">Arianrhod 2E Enemy Creator</p>
+      <nav class="header-nav">
+        <button id="tabEnemies" class="tab-btn active">エネミー管理</button>
+        <button id="tabSkills" class="tab-btn">スキル・パワー管理</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- エネミー管理タブ -->
+      <div id="enemiesTab" class="tab-content active">
+        <div class="tab-layout">
+          <!-- エネミー一覧 -->
+          <section class="enemy-list-section">
+            <div class="section-header">
+              <h2>エネミー一覧</h2>
+              <div class="enemy-list-actions">
+                <button id="bulkExportBtn" class="btn btn-warning" style="display: none;">選択したエネミーを一括エクスポート</button>
+                <button id="newEnemyBtn" class="btn btn-primary">新規作成</button>
+              </div>
+            </div>
+            <div class="search-box">
+              <input type="text" id="searchInput" placeholder="エネミーを検索...">
+            </div>
+            <div id="enemyList" class="enemy-list">
+              <!-- エネミー一覧がここに表示される -->
+            </div>
+          </section>
+
+          <!-- エネミー編集フォーム -->
+          <section class="enemy-form-section" id="enemyFormSection" style="display: none;">
+            <div class="section-header sticky">
+              <h2 id="formTitle">新規エネミー作成</h2>
+              <div class="form-actions">
+                <button id="previewBtn" class="btn btn-info" style="display: none;">プレビュー</button>
+                <button id="downloadZipBtn" class="btn btn-warning" style="display: none;">ZIPダウンロード</button>
+                <button id="downloadXmlBtn" class="btn btn-primary" style="display: none;">XMLダウンロード</button>
+                <button id="saveEnemyBtn" class="btn btn-success">保存</button>
+                <button id="cancelEditBtn" class="btn btn-secondary">キャンセル</button>
+              </div>
+            </div>
+
+            <form id="enemyForm" class="enemy-form">
+              <!-- 基本情報 -->
+              <div class="form-section">
+                <h3>基本情報</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="enemyName">エネミー名 <span class="required">*</span></label>
+                    <input type="text" id="enemyName" name="name" required>
+                  </div>
+              <div class="form-group">
+                <label for="enemyLevel">レベル</label>
+                <input type="number" id="enemyLevel" name="level" min="1" value="1">
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" id="isMob" name="isMob">
+                  モブエネミー
+                </label>
+                <small>チェックするとレベルに(モブ)が自動付与</small>
+              </div>
+              <div class="form-group">
+                <label for="enemyClassification">分類</label>
+                <input type="text" id="enemyClassification" name="classification" placeholder="例: 妖精">
+              </div>
+              <div class="form-group">
+                <label for="enemyAttribute">属性</label>
+                <input type="text" id="enemyAttribute" name="attribute" placeholder="例: 火 / 火/風 / -">
+              </div>
+              <div class="form-group">
+                <label for="enemyPage">掲載ページ</label>
+                <input type="text" id="enemyPage" name="page" placeholder="例: 63">
+              </div>
+              <div class="form-group">
+                <label for="enemyIdentifyValue">識別値</label>
+                <input type="number" id="enemyIdentifyValue" name="identifyValue" min="0" value="0">
+              </div>
+              <div class="form-group">
+                <label for="enemySize">サイズ</label>
+                <input type="number" id="enemySize" name="sizeNum" min="1" max="5" value="2">
+                <small>ユドナリウム上のコマサイズ。デフォルトは2</small>
+              </div>
+                </div>
+              </div>
+
+              <!-- リソース -->
+              <div class="form-section">
+                <h3>リソース</h3>
+                <div class="form-grid form-grid-2">
+                  <div class="form-group">
+                    <label for="enemyHP">HP</label>
+                    <input type="number" id="enemyHP" name="hp" min="0" value="0">
+                  </div>
+                  <div class="form-group">
+                    <label for="enemyMP">MP</label>
+                    <input type="number" id="enemyMP" name="mp" min="0" value="0">
+                  </div>
+                </div>
+
+                <!-- 行動値 -->
+                <div class="resource-calc-row">
+                  <label>行動値</label>
+                  <div class="resource-calc-inputs">
+                    <div class="resource-calc-item">
+                      <label>基本値</label>
+                      <input type="number" id="enemyInitiativeBase" readonly value="0">
+                      <small>敏捷+感知</small>
+                    </div>
+                    <span class="calc-symbol">+</span>
+                    <div class="resource-calc-item">
+                      <label>補正値</label>
+                      <input type="number" id="enemyInitiativeBonus" value="0">
+                      <small>装備・スキル</small>
+                    </div>
+                    <span class="calc-symbol">=</span>
+                    <div class="resource-calc-item">
+                      <label>
+                        <input type="checkbox" id="initiativeManual"> 直接入力
+                      </label>
+                      <input type="number" id="enemyInitiative" name="initiative" min="0" value="0">
+                      <small>最終値</small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 移動力 -->
+                <div class="resource-calc-row">
+                  <label>移動力</label>
+                  <div class="resource-calc-inputs">
+                    <div class="resource-calc-item">
+                      <label>基本値</label>
+                      <input type="number" id="enemyMoveBase" readonly value="0">
+                      <small>筋力+5</small>
+                    </div>
+                    <span class="calc-symbol">+</span>
+                    <div class="resource-calc-item">
+                      <label>補正値</label>
+                      <input type="number" id="enemyMoveBonus" value="0">
+                      <small>装備・スキル</small>
+                    </div>
+                    <span class="calc-symbol">=</span>
+                    <div class="resource-calc-item">
+                      <label>
+                        <input type="checkbox" id="moveManual"> 直接入力
+                      </label>
+                      <input type="number" id="enemyMove" name="move" min="0" value="0">
+                      <small>最終値</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-grid form-grid-2">
+                  <div class="form-group">
+                    <label for="enemyPhysicalDef">物理防御力</label>
+                    <input type="number" id="enemyPhysicalDef" name="physicalDef" min="0" value="0">
+                  </div>
+                  <div class="form-group">
+                    <label for="enemyMagicDef">魔法防御力</label>
+                    <input type="number" id="enemyMagicDef" name="magicDef" min="0" value="0">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 能力値 -->
+              <div class="form-section">
+                <h3>能力値</h3>
+                <div class="ability-toggle">
+                  <label>
+                    <input type="radio" name="abilityMode" value="base" checked>
+                    能力基本値で入力
+                  </label>
+                  <label>
+                    <input type="radio" name="abilityMode" value="normal">
+                    能力値で入力
+                  </label>
+                  <label>
+                    <input type="radio" name="abilityMode" value="action">
+                    アクション/リアクションで入力（モブ専用）
+                  </label>
+                </div>
+
+                <!-- 能力基本値入力 -->
+                <div id="abilityBaseInputs" class="ability-inputs">
+                  <div class="form-grid form-grid-4">
+                    <div class="form-group">
+                      <label for="strBase">筋力基本値</label>
+                      <input type="number" id="strBase" name="strBase" min="0" value="0">
+                      <small>能力値: <span id="strCalc">0</span></small>
+                    </div>
+                    <div class="form-group">
+                      <label for="dexBase">器用基本値</label>
+                      <input type="number" id="dexBase" name="dexBase" min="0" value="0">
+                      <small>能力値: <span id="dexCalc">0</span></small>
+                    </div>
+                    <div class="form-group">
+                      <label for="agiBase">敏捷基本値</label>
+                      <input type="number" id="agiBase" name="agiBase" min="0" value="0">
+                      <small>能力値: <span id="agiCalc">0</span></small>
+                    </div>
+                    <div class="form-group">
+                      <label for="intBase">知力基本値</label>
+                      <input type="number" id="intBase" name="intBase" min="0" value="0">
+                      <small>能力値: <span id="intCalc">0</span></small>
+                    </div>
+                    <div class="form-group">
+                      <label for="senBase">感知基本値</label>
+                      <input type="number" id="senBase" name="senBase" min="0" value="0">
+                      <small>能力値: <span id="senCalc">0</span></small>
+                    </div>
+                    <div class="form-group">
+                      <label for="spiBase">精神基本値</label>
+                      <input type="number" id="spiBase" name="spiBase" min="0" value="0">
+                      <small>能力値: <span id="spiCalc">0</span></small>
+                    </div>
+                    <div class="form-group">
+                      <label for="luckBase">幸運基本値</label>
+                      <input type="number" id="luckBase" name="luckBase" min="0" value="0">
+                      <small>能力値: <span id="luckCalc">0</span></small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 能力値入力 -->
+                <div id="abilityNormalInputs" class="ability-inputs" style="display: none;">
+                  <div class="form-grid form-grid-4">
+                    <div class="form-group">
+                      <label for="str">筋力</label>
+                      <input type="number" id="str" name="str" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="dex">器用</label>
+                      <input type="number" id="dex" name="dex" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="agi">敏捷</label>
+                      <input type="number" id="agi" name="agi" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="int">知力</label>
+                      <input type="number" id="int" name="int" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="sen">感知</label>
+                      <input type="number" id="sen" name="sen" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="spi">精神</label>
+                      <input type="number" id="spi" name="spi" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="luck">幸運</label>
+                      <input type="number" id="luck" name="luck" min="0" value="0">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- アクション/リアクション入力 -->
+                <div id="abilityActionInputs" class="ability-inputs" style="display: none;">
+                  <div class="form-grid form-grid-3">
+                    <div class="form-group">
+                      <label for="action">アクション</label>
+                      <input type="number" id="action" name="action" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="reaction">リアクション</label>
+                      <input type="number" id="reaction" name="reaction" min="0" value="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ドロップ品 -->
+              <div class="form-section">
+                <h3>ドロップ品</h3>
+                <small>下限値の昇順で自動ソートされます。出目の範囲に抜けや重複がないか自動チェックされます。</small>
+                <div class="drop-item-legend">
+                  <div class="drop-legend-item"><strong>下限値:</strong> 2以上</div>
+                  <div class="drop-legend-item"><strong>上限値:</strong> 空欄で「以上」</div>
+                  <div class="drop-legend-item"><strong>アイテム名:</strong> アイテム名を入力（「なし」も可）</div>
+                  <div class="drop-legend-item"><strong>価格:</strong> 数値/非売品/-</div>
+                  <div class="drop-legend-item"><strong>個数:</strong> 1以上の自然数</div>
+                </div>
+                <table class="drop-item-table" id="dropItemsTable">
+                  <thead>
+                    <tr>
+                      <th class="drop-th-fixed">下限値</th>
+                      <th class="drop-th-fixed">上限値</th>
+                      <th class="drop-th-flex drop-th-item-name">アイテム名</th>
+                      <th class="drop-th-flex drop-th-price">価格</th>
+                      <th class="drop-th-fixed drop-th-right">個数</th>
+                      <th class="drop-th-action">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dropItemsContainer">
+                    <!-- ドロップ品の入力欄が動的に追加される -->
+                  </tbody>
+                </table>
+                <button type="button" id="addDropItemBtn" class="btn btn-secondary btn-small">ドロップ品を追加</button>
+              </div>
+
+              <!-- スキル・パワー -->
+              <div class="form-section">
+                <h3>スキル・パワー</h3>
+                <div class="skill-controls">
+                  <button type="button" id="addSkillBtn" class="btn btn-secondary btn-small">スキルを追加</button>
+                  <button type="button" id="addWeaponSkillBtn" class="btn btn-warning btn-small">通常武器攻撃を追加</button>
+                  <button type="button" id="selectFromLibraryBtn" class="btn btn-info btn-small">ライブラリから選択</button>
+                </div>
+                <div id="skillsContainer" class="skills-container">
+                  <!-- スキルが動的に追加される -->
+                </div>
+              </div>
+
+              <!-- カスタムチャットパレットコマンド -->
+              <div class="form-section">
+                <h3>カスタムチャットパレットコマンド</h3>
+                <div class="form-group">
+                  <textarea id="enemyCustomCommands" name="customCommands" rows="8" placeholder="バフ付与コマンドのバリエーションやセッション固有のカスタムコマンドを記述してください。&#10;例：&#10;t&衰弱/1/9999 対象に衰弱を与える&#10;t&衰弱/2/9999 対象に衰弱を与える&#10;&毒/0/9999 バフ追加"></textarea>
+                  <p class="form-hint">入力したコマンドはXML出力時に「識別公開情報」セクションと「バフ関連」セクションの間に追加されます。一般的なバフ操作コマンドは「バフ関連」セクションに自動的に出力されるため、ここではカスタムコマンドのみを記述してください。</p>
+                </div>
+
+                <!-- バフデバフパレット -->
+                <div class="buff-palette-form">
+                  <h4>バフデバフパレット</h4>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="buffName">バフ名</label>
+                      <input type="text" id="buffName" placeholder="例: 衰弱">
+                    </div>
+                    <div class="form-group">
+                      <label for="buffEffect">効果（省略可）</label>
+                      <input type="text" id="buffEffect" placeholder="例: 1">
+                    </div>
+                    <div class="form-group">
+                      <label for="buffRounds">R数（省略可）</label>
+                      <input type="text" id="buffRounds" placeholder="例: 9999">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>
+                      <input type="checkbox" id="buffTarget"> 対象にバフを付与（t&プレフィックス）
+                    </label>
+                  </div>
+                  <div class="form-group buff-button-group">
+                    <button type="button" id="addBuffBtn" class="btn btn-primary">バフを追加</button>
+                    <button type="button" id="addBuffRemoveBtn" class="btn btn-secondary">バフ削除コマンドを追加</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- メモ -->
+              <div class="form-section">
+                <h3>メモ</h3>
+                <div class="form-group">
+                  <textarea id="enemyMemo" name="memo" rows="4" placeholder="GMメモなど"></textarea>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+
+      <!-- スキル・パワー管理タブ -->
+      <div id="skillsTab" class="tab-content">
+        <div class="tab-layout">
+          <section class="skill-library-list-section">
+            <div class="section-header">
+              <h2>スキル・パワーライブラリ</h2>
+              <button id="newSkillLibraryBtn" class="btn btn-primary">新規作成</button>
+            </div>
+            <div class="search-box">
+              <input type="text" id="skillSearchInput" placeholder="スキルを検索...">
+            </div>
+            <div id="skillLibraryList" class="skill-library-list">
+              <!-- スキルライブラリ一覧がここに表示される -->
+            </div>
+          </section>
+
+          <section class="skill-library-form-section" id="skillLibraryFormSection" style="display: none;">
+            <div class="section-header sticky">
+              <h2 id="skillFormTitle">新規スキル作成</h2>
+              <div class="form-actions">
+                <button id="saveSkillLibraryBtn" class="btn btn-success">保存</button>
+                <button id="cancelSkillEditBtn" class="btn btn-secondary">キャンセル</button>
+              </div>
+            </div>
+
+            <form id="skillLibraryForm" class="skill-form">
+              <div class="form-section">
+                <h3>スキル情報</h3>
+                <div class="form-group">
+                  <label for="skillName">スキル名 <span class="required">*</span></label>
+                  <input type="text" id="skillName" name="skillName" placeholder="例: 魔術攻撃:火" required>
+                </div>
+                <div class="form-grid form-grid-3">
+                  <div class="form-group">
+                    <label for="skillTiming">タイミング</label>
+                    <input type="text" id="skillTiming" name="timing" list="timing-options-library" placeholder="例: メジャー">
+                    <datalist id="timing-options-library">
+                      <option value="―">
+                      <option value="パッシブ">
+                      <option value="セットアップ">
+                      <option value="イニシアチブ">
+                      <option value="フリー">
+                      <option value="ムーブ">
+                      <option value="レガシー">
+                      <option value="マイナー">
+                      <option value="メジャー">
+                      <option value="判定の直前">
+                      <option value="判定の直後">
+                      <option value="DRの直前">
+                      <option value="DRの直後">
+                      <option value="リアクション">
+                      <option value="クリンナップ">
+                      <option value="戦闘不能">
+                      <option value="効果参照">
+                    </datalist>
+                  </div>
+                  <div class="form-group">
+                    <label for="skillClassification">分類</label>
+                    <input type="text" id="skillClassification" name="classification" placeholder="例: 魔術(魔法<火>)">
+                  </div>
+                  <div class="form-group">
+                    <label for="skillJudge">判定 <span class="required">*</span></label>
+                    <input type="text" id="skillJudge" name="judge" list="judge-options-library" placeholder="例: 魔術判定" required>
+                    <datalist id="judge-options-library">
+                      <option value="―">
+                      <option value="自動成功">
+                      <option value="命中判定">
+                      <option value="魔術判定">
+                      <option value="錬金術判定">
+                      <option value="呪歌判定">
+                      <option value="回避判定">
+                      <option value="筋力判定">
+                      <option value="器用判定">
+                      <option value="敏捷判定">
+                      <option value="知力判定">
+                      <option value="感知判定">
+                      <option value="精神判定">
+                      <option value="幸運判定">
+                      <option value="効果参照">
+                    </datalist>
+                  </div>
+                </div>
+                <div class="form-grid form-grid-3">
+                  <div class="form-group">
+                    <label for="skillTarget">対象 <span class="required">*</span></label>
+                    <input type="text" id="skillTarget" name="target" placeholder="例: 単体" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="skillRange">射程 <span class="required">*</span></label>
+                    <input type="text" id="skillRange" name="range" placeholder="例: 20m" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="skillCost">コスト</label>
+                    <input type="number" id="skillCost" name="cost" min="0" value="0" placeholder="0">
+                    <small>0の場合、XMLでは―と出力</small>
+                  </div>
+                </div>
+                <div class="form-grid form-grid-3">
+                  <div class="form-group">
+                    <label for="skillSL">SL <span class="required">*</span></label>
+                    <input type="number" id="skillSL" name="sl" min="1" value="1" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="skillCondition">使用条件</label>
+                    <input type="text" id="skillCondition" name="condition" placeholder="例: ラウンド1回">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="skillEffect">効果 <span class="required">*</span></label>
+                  <textarea id="skillEffect" name="effect" rows="6" placeholder="スキルの効果を記述" required></textarea>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-actions">
+        <button id="exportDataBtn" class="btn btn-info">全データエクスポート</button>
+        <button id="importDataBtn" class="btn btn-info">全データインポート</button>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+        <button id="exportSkillLibraryBtn" class="btn btn-info">スキルライブラリエクスポート</button>
+        <button id="importSkillLibraryBtn" class="btn btn-info">スキルライブラリインポート</button>
+        <input type="file" id="importSkillFileInput" accept=".json" style="display: none;">
+        <button id="clearAllBtn" class="btn btn-danger">全データ削除</button>
+      </div>
+      <div class="license-notice" id="copyrightNotice" aria-live="polite"></div>
+      <p class="copyright">© 2025 Arianrhod 2E Enemy Creator</p>
+    </footer>
+  </div>
+
+  <!-- モーダル -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalTitle">確認</h3>
+      <p id="modalMessage"></p>
+      <div class="modal-actions">
+        <button id="modalConfirmBtn" class="btn btn-primary">確認</button>
+        <button id="modalCancelBtn" class="btn btn-secondary">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- スキル選択モーダル -->
+  <div id="skillSelectModal" class="modal">
+    <div class="modal-content modal-large">
+      <h3>スキル・パワーを選択</h3>
+      <div class="search-box">
+        <input type="text" id="skillSelectSearch" placeholder="スキルを検索...">
+      </div>
+      <div id="skillSelectList" class="skill-select-list">
+        <!-- スキル選択リストが表示される -->
+      </div>
+      <div class="modal-actions">
+        <button id="skillSelectCancelBtn" class="btn btn-secondary">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- プレビューモーダル -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content modal-large preview-modal-content">
+      <div class="modal-header draggable">
+        <h3>エネミーXMLプレビュー</h3>
+      </div>
+      <div id="previewContent" class="preview-content">
+        <!-- プレビュー内容が表示される -->
+      </div>
+      <div class="modal-actions">
+        <button id="previewCloseBtn" class="btn btn-secondary" type="button">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- テンプレート -->
+  <template id="template-enemy-empty-state">
+    <div class="empty-state">
+      <p></p>
+    </div>
+  </template>
+
+  <template id="template-enemy-item">
+    <div class="enemy-item" data-enemy-id="">
+      <div class="enemy-item-checkbox">
+        <input type="checkbox" class="enemy-checkbox" data-enemy-id="">
+      </div>
+      <div class="enemy-item-content">
+        <div class="enemy-item-header">
+          <div class="enemy-item-name"></div>
+          <div class="enemy-item-level"></div>
+        </div>
+        <div class="enemy-item-details">
+          <span><strong>分類:</strong> <span class="enemy-classification"></span></span>
+          <span><strong>HP:</strong> <span class="enemy-hp"></span></span>
+          <span><strong>属性:</strong> <span class="enemy-attribute"></span></span>
+        </div>
+        <div class="enemy-item-actions">
+          <button class="btn btn-primary btn-small enemy-edit-btn">編集</button>
+          <button class="btn btn-warning btn-small enemy-download-btn">ZIP</button>
+          <button class="btn btn-primary btn-small enemy-download-xml-btn">XML</button>
+          <button class="btn btn-info btn-small enemy-duplicate-btn">複製</button>
+          <button class="btn btn-danger btn-small enemy-delete-btn">削除</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="template-skill-item">
+    <div class="skill-item" data-id="">
+      <div class="skill-header">
+        <span class="skill-timing-badge"></span>
+        <span class="skill-name-display"></span>
+        <div class="skill-actions">
+          <button type="button" class="btn btn-secondary btn-small skill-move-up-btn">↑</button>
+          <button type="button" class="btn btn-secondary btn-small skill-move-down-btn">↓</button>
+          <button type="button" class="btn btn-info btn-small skill-edit-btn">編集</button>
+          <button type="button" class="btn btn-danger btn-small skill-delete-btn">削除</button>
+        </div>
+      </div>
+      <div class="skill-details" style="display: none;">
+        <div class="form-grid form-grid-3">
+          <div class="form-group">
+            <label>スキル名 <span class="required">*</span></label>
+            <input type="text" class="skill-name" required>
+          </div>
+          <div class="form-group">
+            <label>タイミング</label>
+            <input type="text" class="skill-timing" placeholder="例: メジャー">
+            <datalist class="timing-datalist"></datalist>
+          </div>
+          <div class="form-group">
+            <label>分類</label>
+            <input type="text" class="skill-classification">
+          </div>
+        </div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group">
+            <label>判定 <span class="required">*</span></label>
+            <input type="text" class="skill-judge" required>
+            <datalist class="judge-datalist"></datalist>
+          </div>
+          <div class="form-group">
+            <label>対象 <span class="required">*</span></label>
+            <input type="text" class="skill-target" required>
+          </div>
+          <div class="form-group">
+            <label>射程 <span class="required">*</span></label>
+            <input type="text" class="skill-range" required>
+          </div>
+        </div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group">
+            <label>コスト</label>
+            <input type="number" class="skill-cost" min="0" value="0" placeholder="0">
+            <small>0の場合、XMLでは―と出力</small>
+          </div>
+          <div class="form-group">
+            <label>SL <span class="required">*</span></label>
+            <input type="number" class="skill-sl" min="1" value="1" required>
+          </div>
+          <div class="form-group">
+            <label>使用条件</label>
+            <input type="text" class="skill-condition">
+          </div>
+        </div>
+        <div class="weapon-meta-section" style="display: none;">
+          <div class="weapon-meta-header">
+            <h4>通常武器攻撃のメタ情報</h4>
+            <p>武器種別などを入力すると《スキル名》の後ろに `(種別/装備/攻撃方法/ダメージ)` が自動付与されます。</p>
+          </div>
+          <div class="form-grid form-grid-4">
+            <div class="form-group">
+              <label>武器種別</label>
+              <input type="text" class="weapon-type" placeholder="例: 長剣">
+              <datalist class="weapon-type-datalist"></datalist>
+            </div>
+            <div class="form-group">
+              <label>装備部位</label>
+              <input type="text" class="weapon-grip" placeholder="例: 片">
+              <datalist class="weapon-grip-datalist"></datalist>
+            </div>
+            <div class="form-group">
+              <label>攻撃方法</label>
+              <input type="text" class="weapon-method" placeholder="例: 白兵">
+              <datalist class="weapon-method-datalist"></datalist>
+            </div>
+            <div class="form-group">
+              <label>ダメージ種別</label>
+              <input type="text" class="weapon-damage" placeholder="例: 物理">
+              <datalist class="weapon-damage-datalist"></datalist>
+            </div>
+          </div>
+          <p class="weapon-meta-note">タイミング/コスト/SL/使用条件/効果/クリティカルは通常武器攻撃の既定値が固定で適用されます。</p>
+        </div>
+        <div class="skill-judge-commands-section" style="display: none;">
+          <div class="skill-judge-commands-header">
+            <h4>判定用コマンド</h4>
+            <button type="button" class="btn btn-secondary btn-small add-judge-command-btn">判定コマンド追加</button>
+          </div>
+          <div class="skill-judge-commands-container"></div>
+        </div>
+        <div class="skill-critical-section" style="display: none;">
+          <div class="form-group">
+            <label>
+              <input type="checkbox" class="skill-needs-critical">
+              クリティカル時の処理を設定
+            </label>
+            <small>判定が「効果参照」の場合は必要に応じてチェック</small>
+          </div>
+          <div class="skill-critical-options" style="display: none;">
+            <div class="critical-options">
+              <label class="radio-label">
+                <input type="radio" class="critical-radio" value="diceRoll">
+                ダイスロール増加
+              </label>
+              <label class="radio-label">
+                <input type="radio" class="critical-radio" value="costZero">
+                コスト0
+              </label>
+              <label class="radio-label">
+                <input type="radio" class="critical-radio" value="custom">
+                カスタム処理
+              </label>
+            </div>
+            <div class="form-group custom-critical-group" style="display: none;">
+              <label>カスタム処理</label>
+              <input type="text" class="skill-custom-critical" placeholder="例: ダメージ+10">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>効果 <span class="required">*</span></label>
+          <textarea class="skill-effect" rows="4" required></textarea>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="template-judge-command">
+    <div class="judge-command-item" data-id="">
+      <div class="judge-command-header">
+        <div class="command-label-field">
+          <label class="command-label-caption">判定コマンド 1</label>
+          <input type="text" class="command-label-input judge-label-input" aria-label="判定コマンド表記" value="" placeholder="チャットパレット表記（任意）">
+        </div>
+        <button type="button" class="btn btn-light btn-small command-label-reset-btn judge-label-reset-btn">デフォルトに戻す</button>
+        <button type="button" class="btn btn-danger btn-small judge-delete-btn">削除</button>
+      </div>
+      <div class="form-grid form-grid-3">
+        <div class="form-group">
+          <label>ダイス数</label>
+          <input type="number" class="judge-dice" min="1" value="2" placeholder="2">
+          <small>例: 2 (2D6)</small>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" class="fixed-auto-checkbox">
+            固定値を自動算出 <span class="judge-ability-label"></span>
+          </label>
+          <input type="text" class="judge-fixed" placeholder="0">
+          <small>判定から算出または直接入力</small>
+        </div>
+        <div class="form-group">
+          <label>補正値</label>
+          <input type="number" class="judge-bonus" value="0" placeholder="0">
+          <small>装備・スキル補正</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>判定コマンドプレビュー</label>
+        <input type="text" class="judge-preview" readonly value="">
+      </div>
+      <div class="damage-commands-section">
+        <div class="damage-commands-header">
+          <h6>ダメージコマンド</h6>
+          <button type="button" class="btn btn-secondary btn-small add-damage-command-btn">ダメージ追加</button>
+        </div>
+        <div class="damage-commands-container"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="template-damage-command">
+    <div class="damage-command-item" data-id="">
+      <div class="damage-command-header">
+        <div class="command-label-field">
+          <label class="command-label-caption">ダメージ 1</label>
+          <input type="text" class="command-label-input damage-label-input" aria-label="ダメージコマンド表記" value="" placeholder="チャットパレット表記（任意）">
+        </div>
+        <button type="button" class="btn btn-light btn-small command-label-reset-btn damage-label-reset-btn">デフォルトに戻す</button>
+        <button type="button" class="btn btn-danger btn-small damage-delete-btn">削除</button>
+      </div>
+      <div class="form-grid form-grid-4">
+        <div class="form-group">
+          <label>ダイス数</label>
+          <input type="number" class="damage-dice" min="0" value="0" placeholder="0">
+          <small>例: 2 (2D6)</small>
+        </div>
+        <div class="form-group">
+          <label>固定値</label>
+          <input type="number" class="damage-fixed" min="0" value="0" placeholder="0">
+          <small>基本ダメージ</small>
+        </div>
+        <div class="form-group">
+          <label>補正値</label>
+          <input type="number" class="damage-bonus" value="0" placeholder="0">
+          <small>装備・スキル補正</small>
+        </div>
+        <div class="form-group">
+          <label>プレビュー</label>
+          <input type="text" class="damage-preview" readonly value="">
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="template-drop-item-row">
+    <tr class="drop-item-row" data-id="">
+      <td class="drop-td-fixed" data-label="下限値">
+        <input type="number" class="drop-min" min="2">
+      </td>
+      <td class="drop-td-fixed" data-label="上限値">
+        <input type="number" class="drop-max" min="2">
+      </td>
+      <td class="drop-td-flex drop-td-item-name" data-label="アイテム名">
+        <input type="text" class="drop-item-name" placeholder="妖精の羽 / なし">
+      </td>
+      <td class="drop-td-flex drop-td-price" data-label="価格">
+        <input type="text" class="drop-price" placeholder="10 / 非売品">
+      </td>
+      <td class="drop-td-fixed drop-td-right" data-label="個数">
+        <input type="number" class="drop-quantity" min="1" value="1">
+      </td>
+      <td class="drop-td-action">
+        <button type="button" class="btn btn-danger btn-small drop-delete-btn">削除</button>
+      </td>
+    </tr>
+  </template>
+
+  <template id="template-skill-select-empty-state">
+    <div class="empty-state">
+      <p>スキルがまだ登録されていません。</p>
+    </div>
+  </template>
+
+  <template id="template-skill-select-item">
+    <div class="skill-select-item">
+      <div class="skill-select-header">
+        <span class="skill-timing-badge"></span>
+        <span class="skill-select-name"></span>
+      </div>
+      <div class="skill-select-effect"></div>
+    </div>
+  </template>
+
+  <template id="template-skill-library-empty-state">
+    <div class="empty-state">
+      <p></p>
+    </div>
+  </template>
+
+  <template id="template-skill-library-item">
+    <div class="skill-library-item" data-skill-id="">
+      <div class="skill-library-header">
+        <span class="skill-timing-badge"></span>
+        <span class="skill-library-name"></span>
+      </div>
+      <div class="skill-library-effect"></div>
+      <div class="skill-library-actions">
+        <button class="btn btn-primary btn-small skill-library-edit-btn">編集</button>
+        <button class="btn btn-info btn-small skill-library-duplicate-btn">複製</button>
+        <button class="btn btn-danger btn-small skill-library-delete-btn">削除</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- 外部ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

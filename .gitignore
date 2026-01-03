@@ -1,2 +1,19 @@
-.vscode/*
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ/一時ファイル
+*~
+*.swp
+*.tmp
+*.bak
+
+# VS Code
+.vscode/
 *.code-workspace
+
+# JetBrains
+.idea/
+
+# Claude Code
+.claude/
